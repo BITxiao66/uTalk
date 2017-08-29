@@ -1,6 +1,8 @@
 # uTalk
 
-A communication soft for Linux.
+A communication software for Linux.
 
-Team Members: DaDaMrX,sunjinda,xiaoziyuan
+## Team Members: 
+
+DaDaMrX,fihxc,sunjinda,xiaoziyuan
 
