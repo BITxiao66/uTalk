@@ -2,4 +2,4 @@
 
 A communication soft for Linux.
 
-Team Members: DaDaMrX
+Team Members: DaDaMrX,sunjinda
