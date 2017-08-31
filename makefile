@@ -1,2 +1,2 @@
-uTalk: uTalk.c
-	gcc uTalk.c -o uTalk `pkg-config --cflags --libs gtk+-3.0`
+uTalk: main.c main.h
+	gcc main.c -o uTalk `pkg-config --cflags --libs gtk+-3.0`
