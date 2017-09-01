@@ -55,14 +55,14 @@ int check_signup(const char* line)
 	user_name[j]=line[i];
 	i++; j++;
     }
-    user_name[++j]=0;
+    user_name[j]=0;
     i+=10; j=0;
     while (line[i]!=';')
     {
 	user_pw[j]=line[i];
 	i++; j++;
     }
-    user_pw[++j]=0;
+    user_pw[j]=0;
 
     //check if the username exit
     char comm[1024];
