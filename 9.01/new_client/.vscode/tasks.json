@@ -1,0 +1,22 @@
+/*******************************************************************************
+ * C++ Compile And Run Task in VS Code for ACMer
+ * File:          task.json
+ * Location:      ${workspaceRoot}/.vscode/
+ * Last Modified: July 23, 2017
+ * Author:        DaDaMr_X <dadamrxx@gmail.com>
+ * Licence:       Copyright (c) 2017 DaDaMr_X
+ ******************************************************************************/
+ {
+    "version": "0.1.0",
+    "command": "bash",
+    "isShellCommand": true,
+    "args": ["-c"],
+    "tasks": [
+        {
+            "taskName": "compile",
+            "suppressTaskName": true,
+            "isBuildCommand": true,
+            "args": ["make"]
+        }
+    ]
+}
