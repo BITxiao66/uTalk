@@ -6,9 +6,10 @@
 
 GtkBuilder *builder;
 GtkWidget *window;
+gchar username[20];
 gchar chat_friend_name[20];
 
-void update_local_ui(const gchar *name, gchar *msg){
+void update_local_ui(gchar *name, gchar *msg){
     GtkWidget * msg_textview = GTK_WIDGET(gtk_builder_get_object(builder, "msg_textview"));
     GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW (msg_textview));
 
@@ -19,6 +20,10 @@ void update_local_ui(const gchar *name, gchar *msg){
     gtk_text_buffer_insert (msg_textbuffer, &end, ":\n", -1);
     gtk_text_buffer_insert (msg_textbuffer, &end, msg, -1);
     gtk_text_buffer_insert (msg_textbuffer, &end, "\n\n", -1);
+}
+
+void receive_msg_from_server(gchar *friend_name, gchar * msg){
+    update_local_ui(friend_name, msg);
 }
 
 gchar *get_type_textview_msg(){
@@ -32,10 +37,6 @@ gchar *get_type_textview_msg(){
     gchar * msg = gtk_text_buffer_get_text(type_textbuffer, &start, &end, TRUE);
     gtk_text_buffer_set_text (type_textbuffer, "", -1);
     return msg;
-}
-
-void receive_msg_from_server(gchar *friend_name, gchar * msg){
-    update_local_ui(friend_name, msg);
 }
 
 void send_button_press(GtkWidget *widget, gpointer *data){
@@ -115,8 +116,24 @@ void add_friend (GtkWidget *widget, gpointer *data){
     gtk_widget_show_all (friends_listbox);
 }
 
-gboolean chat_ui (const gchar *username){
+void load_friends_list(){
+    gint friends_num;
+    gchar *friends_list[20];
+    request_friends_list_from_server(username, &friends_num, friends_list);
+    GtkWidget *friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
+    for (int i = 0; i < friends_num; i++){
+        GtkWidget *friend = uTalk_friend_new("dada.jpg", friends_list[i]);
+        gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, -1);
+    }
+}
+
+void tmp(){
+    receive_msg_from_server("ABC", "Hello");
+}
+
+gboolean chat_ui (const gchar *rev_username){
     gtk_init (NULL, NULL);
+    strcpy(username, rev_username);
 
     builder = gtk_builder_new_from_file ("chat_ui.glade");
 
@@ -130,9 +147,11 @@ gboolean chat_ui (const gchar *username){
     g_signal_connect (G_OBJECT(add_friend_button), "clicked", G_CALLBACK(add_friend), NULL);
 
     GtkWidget *tmp_button = GTK_WIDGET (gtk_builder_get_object(builder, "tmp_button"));
-    g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(tmp), NULL);
 
     memset(chat_friend_name, 0, sizeof(chat_friend_name));
+
+    load_friends_list();
 
     gtk_widget_show_all(window);
     gtk_main();
