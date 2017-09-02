@@ -45,7 +45,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="signup">
+          <object class="GtkButton" id="register">
             <property name="label" translatable="yes">Sign Up</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
@@ -89,6 +89,7 @@
               <object class="GtkEntry" id="username">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
+                <property name="max_width_chars">15</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>
@@ -101,6 +102,7 @@
                 <property name="can_focus">True</property>
                 <property name="visibility">False</property>
                 <property name="invisible_char">*</property>
+                <property name="max_width_chars">16</property>
               </object>
               <packing>
                 <property name="left_attach">1</property>

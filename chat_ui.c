@@ -1,15 +1,12 @@
 #include <gtk/gtk.h>
 #include <string.h>
+#include "com_with_server.h"
+#include "error_dialog_ui.h"
+#include "chat_ui.h"
 
 GtkBuilder *builder;
-
-gboolean send_msg_to_server(const gchar *name, const gchar *msg){
-    return TRUE;
-}
-
-gboolean send_friend_name_to_server(const gchar *friend_name){
-    return TRUE;
-}
+GtkWidget *window;
+gchar chat_friend_name[20];
 
 void update_local_ui(const gchar *name, gchar *msg){
     GtkWidget * msg_textview = GTK_WIDGET(gtk_builder_get_object(builder, "msg_textview"));
@@ -24,7 +21,7 @@ void update_local_ui(const gchar *name, gchar *msg){
     gtk_text_buffer_insert (msg_textbuffer, &end, "\n\n", -1);
 }
 
-gchar *get_msg(){
+gchar *get_type_textview_msg(){
     GtkWidget * type_textview = GTK_WIDGET (gtk_builder_get_object(builder, "type_textview"));
     GtkTextBuffer * type_textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (type_textview));
     
@@ -42,42 +39,42 @@ void receive_msg_from_server(gchar *friend_name, gchar * msg){
 }
 
 void send_button_press(GtkWidget *widget, gpointer *data){
-    // 1. Get usernames and the message
-    GtkWidget *username_label = GTK_WIDGET (gtk_builder_get_object(builder, "username_label"));
-    const gchar *user_name = gtk_label_get_text ((GtkLabel *)username_label);
-    gchar *msg = get_msg();
+    // 1. Get chat_friend_name and the message
+    if (strcmp(chat_friend_name, "") == 0){
+        return;
+    }
+    gchar *msg = get_type_textview_msg();
     if (strlen(msg) <= 0){
         return;
     }
 
     // 2. Send to server
-    gboolean send_msg_to_server_succeed = send_msg_to_server(user_name, msg);
+    gboolean send_msg_to_server_succeed = send_msg_to_server(chat_friend_name, msg);
     if (send_msg_to_server_succeed == FALSE){
-        printf("Connet faild!\n");
-        // It's great if we can pop a window 
+        error_dialog (window, "Connet faild!");
         return;
     }
 
     // 3. Set the text buffer in UI
-    update_local_ui(user_name, msg);
+    update_local_ui(chat_friend_name, msg);
 }
 
 void uTalk_friend_selected (GtkWidget *widget, GtkWidget *name_label){
     // Update chatwith label
     GtkWidget *chatwith_label = GTK_WIDGET (gtk_builder_get_object(builder, "chatwith_label"));
-    const gchar *friend_name = gtk_label_get_text ((GtkLabel *)widget);
-    gtk_label_set_text ((GtkLabel *)chatwith_label, friend_name);
+    const gchar *name = gtk_label_get_text ((GtkLabel *)widget);
+    strcpy(chat_friend_name, name);
+    gtk_label_set_text ((GtkLabel *)chatwith_label, chat_friend_name);
 
     // Clear msg_textview
     GtkWidget *msg_textview = GTK_WIDGET (gtk_builder_get_object(builder, "msg_textview"));
     GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
     gtk_text_buffer_set_text (msg_textbuffer, "", -1);
 
-    // Send friend_name to server
-    gboolean send_friend_name_to_server_succeed = send_friend_name_to_server(friend_name);
-    if (send_friend_name_to_server_succeed == FALSE){
-        printf("Connet faild!\n");
-        // It's great if we can pop a window 
+    // Send chat_friend_name to server
+    gboolean build_chat_with_server_succeed = build_chat_with_server(chat_friend_name);
+    if (build_chat_with_server_succeed == FALSE){
+        error_dialog (window, "Connet faild!");
         return;
     }
 }
@@ -118,12 +115,12 @@ void add_friend (GtkWidget *widget, gpointer *data){
     gtk_widget_show_all (friends_listbox);
 }
 
-int main (int argc, char *argv[]){
-    gtk_init (&argc, &argv);
+gboolean chat_ui (const gchar *username){
+    gtk_init (NULL, NULL);
 
-    builder = gtk_builder_new_from_file ("chat.glade");
+    builder = gtk_builder_new_from_file ("chat_ui.glade");
 
-    GtkWidget *window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
+    window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
     g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     GtkWidget *send_button = GTK_WIDGET(gtk_builder_get_object(builder, "send_button"));
@@ -133,9 +130,11 @@ int main (int argc, char *argv[]){
     g_signal_connect (G_OBJECT(add_friend_button), "clicked", G_CALLBACK(add_friend), NULL);
 
     GtkWidget *tmp_button = GTK_WIDGET (gtk_builder_get_object(builder, "tmp_button"));
-    g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(receive_msg_from_server), "Server");
+    g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+
+    memset(chat_friend_name, 0, sizeof(chat_friend_name));
 
     gtk_widget_show_all(window);
     gtk_main();
-    return 0;
+    return TRUE;
 }

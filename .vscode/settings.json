@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "gtk.h": "c"
+        "gtk.h": "c",
+        "error_dialog_ui.h": "c",
+        "chat_ui.h": "c",
+        "com_with_server.h": "c"
     }
 }
