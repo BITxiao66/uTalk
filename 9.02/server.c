@@ -24,6 +24,10 @@
  #define CLPORT    8079                          //client's chat port
  #define MYKEY   12345
  #define SIZE    10240
+
+ int client_sockfd;
+ int _2_server_sockfd;
+ int userNum;   
  /********************************************************************************
 Description : sign up in database
 Prameter    : Function is not completed.
@@ -189,6 +193,72 @@ void itoa(int n,char*str)
 }
 
  /********************************************************************************
+ * Description : int to string
+ * Prameter    : int n:a in number   const char* str:destination
+ * Return      : void
+ * Side effect : Function is not completed.
+ * Author      : xiaoziyuan
+ * Date        : 2017.09.01
+ * Time        : 11:03:00
+ ********************************************************************************/
+ void* _pthread_entrance(void* p)
+ {
+    char buf[100];
+    int recvbytes;
+    while(1)
+    {
+        recvbytes=recv(_2_server_sockfd, buf, 100, 0);    //reserve log request
+        if(recvbytes==0)
+        {
+            userNum--;
+            return NULL;
+        }
+        else
+        {
+            if(buf[1]=='0')                      //log in
+            {
+                if(check_login(buf+3))           //log in success
+                {
+                    send(_2_server_sockfd,"0",strlen("0"),0);
+                }
+                else                             
+                {
+                    send(_2_server_sockfd,"-1",strlen("-1"),0);
+                    while(1)
+                    {
+                        recv(_2_server_sockfd, buf, 100, 0);
+                        if(check_login(buf+3))
+                        {
+                            send(_2_server_sockfd,"0",strlen("0"),0);
+                            break;
+                        }
+                        else
+                        {
+                            send(_2_server_sockfd,"-1",strlen("-1"),0);
+                        }
+                    }
+                }
+            }
+            else if(buf[1]=='1')                 //sign up
+            {
+                if(check_signup(buf+3))          //sign up success
+                {
+                    send(_2_server_sockfd,"0",strlen("0"),0);
+                }
+                else
+                {
+                    send(_2_server_sockfd,"-1",strlen("-1"),0);
+                }
+            }
+            else                                 //invalid 
+            {
+                send(_2_server_sockfd,"Invalid command",strlen("Invalid command"),0);
+            }
+        }
+        
+    }
+ }
+ /********************************************************************************
  * Description : After user clicked the signin button in signin window, signin.
  * Prameter    : Function is not completed.
  * Return      : void
@@ -202,19 +272,22 @@ int main()
     int  ary_sockfd[10];                         //arrar for clients' sockfd
     char buf[100];
     int listen_sockfd;                           //server's listen socketfd
-    int client_sockfd;                           //client's listen socketfd
-    int server_sockfd;                           //chat socketfd
+    //int client_sockfd;                           //client's listen socketfd
+   // int _2_server_sockfd;                           //chat socketfd
     socklen_t listen_len;
     socklen_t client_len;
     socklen_t server_len;
     struct sockaddr_in listen_sockaddr;
     struct sockaddr_in client_sockaddr;
     struct sockaddr_in server_sockaddr;
-    int userNum;                                 //the number of current online user 
+                                  //the number of current online user 
     struct in_addr client_ip;                    //the client's address information
+    pthread_t ptid[10];
     printf("\n======================server initialization======================\n");
     while(1)
     {
+        struct in_addr sin_addr;
+
         listen_sockfd = socket(AF_INET,SOCK_STREAM, 0);                        // 定义套接字类型   
 		listen_sockaddr.sin_family = AF_INET;
 		listen_sockaddr.sin_port = htons(MYPORT);
@@ -249,53 +322,31 @@ int main()
 			 exit(1);
         }
         else                                     //connect success
-        {
-            recv(client_sockfd, buf, 100, 0);    //reserve log request
-
-            if(buf[1]=='0')                      //log in
-            {
-                if(check_login(buf+3))           //log in success
-                {
-                    client_ip=client_sockaddr.sin_addr;
-                    itoa(PORT+userNum,buf);
-                    send(client_sockfd,buf,strlen(buf),0);
-                }
-                else                             
-                {
-                    send(client_sockfd,"-1",strlen("-1"),0);
-                    while(1)
-                    {
-                        recv(client_sockfd, buf, 100, 0);
-                        if(check_login(buf+3))
-                        {
-                            itoa(PORT+userNum,buf);
-                            send(client_sockfd,buf,strlen(buf),0);
-                            break;
-                        }
-                        else
-                        {
-                            send(client_sockfd,"-1",strlen("-1"),0);
-                        }
-                    }
-                }
-            }
-            else if(buf[1]=='1')                 //sign up
-            {
-                if(check_signup(buf+3))          //sign up success
-                {
-                    send(client_sockfd,"0",strlen("0"),0);
-                }
-                else
-                {
-                    send(client_sockfd,"-1",strlen("-1"),0);
-                }
-            }
-            else                                 //invalid 
-            {
-                send(client_sockfd,"Invalid command",strlen("Invalid command"),0);
-            }
+        {   sin_addr=client_sockaddr.sin_addr;
+            itoa(PORT+userNum,buf);
+			send(client_sockfd,buf,strlen(buf),0);
         }
+
+
+        _2_server_sockfd = socket(AF_INET,SOCK_STREAM, 0); // 定义套接字类型   
+		server_sockaddr.sin_family = AF_INET;
+		server_sockaddr.sin_port = htons(PORT+userNum);
+		server_sockaddr.sin_addr=sin_addr; 
+		server_len = sizeof(server_sockaddr);
+		bzero(&(server_sockaddr.sin_zero),sizeof(server_sockaddr.sin_zero)); 
+		sleep(1);
+		ary_sockfd[userNum]=_2_server_sockfd;
+		
+		if (connect(_2_server_sockfd, (struct sockaddr *)&server_sockaddr,sizeof(struct sockaddr_in)) == -1) 
+		{ 
+			perror("connect");
+			exit(1); 
+		}
+		else
+		{
+			userNum++;
+        }
+		pthread_create(&ptid[userNum],NULL,_pthread_entrance,NULL);
         close(listen_sockfd);
     }
-
 }
