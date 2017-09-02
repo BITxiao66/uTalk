@@ -3,13 +3,18 @@
 #include "com_with_server.h"
 #include "error_dialog_ui.h"
 #include "chat_ui.h"
+// #include "msg_server.h"
 
 GtkBuilder *builder;
 GtkWidget *window;
+GtkWidget *friends_listbox;
 gchar username[20];
-gchar chat_friend_name[20];
+gchar cur_chat_friend_name[20];
 
-void update_local_ui(gchar *name, gchar *msg){
+GList *friends_name_label_list;
+GList *friends_msg_label_list;
+
+void update_msg_textview(const gchar *name, const gchar *msg){
     GtkWidget * msg_textview = GTK_WIDGET(gtk_builder_get_object(builder, "msg_textview"));
     GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW (msg_textview));
 
@@ -22,8 +27,24 @@ void update_local_ui(gchar *name, gchar *msg){
     gtk_text_buffer_insert (msg_textbuffer, &end, "\n\n", -1);
 }
 
-void receive_msg_from_server(gchar *friend_name, gchar * msg){
-    update_local_ui(friend_name, msg);
+void update_friends_list (const gchar *friend_name, const gchar *msg){
+    GList *l_name = friends_name_label_list;
+    GList *l_msg = friends_msg_label_list;
+    for (; l_name != NULL; l_name = l_name->next, l_name = l_name->next){
+        const gchar *name = gtk_label_get_text ((GtkLabel *)l_name->data);
+        if (strcmp(name, friend_name) == 0){
+            gtk_label_set_text ((GtkLabel *)l_msg->data, msg);
+            break;
+        }
+    }
+}
+
+void receive_msg_from_server (const char *friend_name, const char *msg){
+    update_friends_list (friend_name, msg);
+
+    if (strcmp(friend_name, cur_chat_friend_name) == 0){
+        update_msg_textview(friend_name, msg);
+    }
 }
 
 gchar *get_type_textview_msg(){
@@ -40,8 +61,8 @@ gchar *get_type_textview_msg(){
 }
 
 void send_button_press(GtkWidget *widget, gpointer *data){
-    // 1. Get chat_friend_name and the message
-    if (strcmp(chat_friend_name, "") == 0){
+    // 1. Get cur_chat_friend_name and the message
+    if (strcmp(cur_chat_friend_name, "") == 0){
         return;
     }
     gchar *msg = get_type_textview_msg();
@@ -50,39 +71,46 @@ void send_button_press(GtkWidget *widget, gpointer *data){
     }
 
     // 2. Send to server
-    gboolean send_msg_to_server_succeed = send_msg_to_server(chat_friend_name, msg);
+    gboolean send_msg_to_server_succeed = send_msg_to_server(cur_chat_friend_name, msg);
     if (send_msg_to_server_succeed == FALSE){
         error_dialog (window, "Connet faild!");
         return;
     }
 
     // 3. Set the text buffer in UI
-    update_local_ui(chat_friend_name, msg);
+    update_msg_textview(username, msg);
 }
 
-void uTalk_friend_selected (GtkWidget *widget, GtkWidget *name_label){
-    // Update chatwith label
+void uTalk_friend_selected (GtkWidget *name_label, GtkWidget *widget){
+    // Get chatwith label
     GtkWidget *chatwith_label = GTK_WIDGET (gtk_builder_get_object(builder, "chatwith_label"));
-    const gchar *name = gtk_label_get_text ((GtkLabel *)widget);
-    strcpy(chat_friend_name, name);
-    gtk_label_set_text ((GtkLabel *)chatwith_label, chat_friend_name);
+    const gchar *name = gtk_label_get_text ((GtkLabel *)name_label);
+    
+    // If the friend is selected, do nothing
+    if (strcmp(name, cur_chat_friend_name) == 0) return;
+    
+    // Update chatwith label
+    strcpy(cur_chat_friend_name, name);
+    gtk_label_set_text ((GtkLabel *)chatwith_label, cur_chat_friend_name);
 
     // Clear msg_textview
     GtkWidget *msg_textview = GTK_WIDGET (gtk_builder_get_object(builder, "msg_textview"));
     GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
     gtk_text_buffer_set_text (msg_textbuffer, "", -1);
 
-    // Send chat_friend_name to server
-    gboolean build_chat_with_server_succeed = build_chat_with_server(chat_friend_name);
-    if (build_chat_with_server_succeed == FALSE){
+    // Send cur_chat_friend_name to server
+    gboolean succeed = build_chat_with_server(cur_chat_friend_name);
+    if (succeed == FALSE){
         error_dialog (window, "Connet faild!");
         return;
     }
 }
 
-GtkWidget *uTalk_friend_new (gchar *avator_path, gchar *friend_name){
+GtkWidget *uTalk_friend_new (gchar *avator_path, gchar *friend_name, gchar *msg, GtkWidget **t_name_label, GtkWidget **t_msg_label){
+    // Get avator image
     GtkWidget *avator_image = gtk_image_new_from_file (avator_path);
     
+    // Create friend name label
     GtkWidget *name_label = gtk_label_new (friend_name);
     PangoAttrList *name_attr_list = pango_attr_list_new ();
     PangoAttribute *name_attr_scale = pango_attr_scale_new (1.2);
@@ -90,70 +118,108 @@ GtkWidget *uTalk_friend_new (gchar *avator_path, gchar *friend_name){
     gtk_label_set_attributes ((GtkLabel *)name_label, name_attr_list);
     pango_attr_list_unref (name_attr_list);
     
-    GtkWidget *msg_label = gtk_label_new ("");
+    // Create message label
+    GtkWidget *msg_label = gtk_label_new (msg);
     
+    // Combine name_label and msg_label
     GtkWidget *name_and_msg_box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
     gtk_box_set_homogeneous (GTK_BOX(name_and_msg_box), TRUE);
     gtk_box_pack_start (GTK_BOX(name_and_msg_box), name_label, FALSE, TRUE, 0);
     gtk_box_pack_start (GTK_BOX(name_and_msg_box), msg_label, FALSE, TRUE, 0);
     
+    // Combine with avator
     GtkWidget *friend_box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
     gtk_box_pack_start (GTK_BOX(friend_box), avator_image, FALSE, TRUE, 0);
     gtk_box_pack_start (GTK_BOX(friend_box), name_and_msg_box, FALSE, TRUE, 0);
 
+    // Wrapped with an event box for responsing click
     GtkWidget *friend_eventbox = gtk_event_box_new ();
     gtk_widget_set_events (friend_eventbox, GDK_BUTTON_PRESS_MASK);
     g_signal_connect_swapped (G_OBJECT(friend_eventbox), "button-press-event", G_CALLBACK(uTalk_friend_selected), name_label);
     gtk_container_add (GTK_CONTAINER(friend_eventbox), friend_box);
 
+    // Set the addition arguement
+    *t_name_label = name_label;
+    *t_msg_label = msg_label;
+
     return friend_eventbox;
 }
 
 void add_friend (GtkWidget *widget, gpointer *data){
-    GtkWidget *friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
-    GtkWidget *friend = uTalk_friend_new("dada.jpg", "DaDax");
+    GtkWidget *name_label, *msg_label;
+    GtkWidget *friend = uTalk_friend_new("dada.jpg", "DaDax", "offline msg", &name_label, &msg_label);
     gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, 0);
+    friends_name_label_list = g_list_insert ((GList *)friends_name_label_list, name_label, 0);
+    friends_msg_label_list = g_list_insert ((GList *)friends_msg_label_list, msg_label, 0);
     gtk_widget_show_all (friends_listbox);
 }
 
 void load_friends_list(){
     gint friends_num;
-    gchar *friends_list[20];
-    request_friends_list_from_server(username, &friends_num, friends_list);
+    gchar *friends_list[20], *msg_list[20];
+    gboolean succeed = request_friends_list_from_server (username, &friends_num, friends_list, msg_list);
+    if (succeed == FALSE){
+        GtkWidget *window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
+        error_dialog (window, "Connet faild!");
+        return;
+    }
     GtkWidget *friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
     for (int i = 0; i < friends_num; i++){
-        GtkWidget *friend = uTalk_friend_new("dada.jpg", friends_list[i]);
+        GtkWidget *name_label, *msg_label;
+        GtkWidget *friend = uTalk_friend_new("dada.jpg", friends_list[i], msg_list[i], &name_label, &msg_label);
         gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, -1);
+        friends_name_label_list = g_list_insert ((GList *)friends_name_label_list, name_label, -1);
+        friends_msg_label_list = g_list_insert ((GList *)friends_msg_label_list, msg_label, -1);
     }
 }
 
 void tmp(){
-    receive_msg_from_server("ABC", "Hello");
+    receive_msg_from_server("DaDax", "Hello");
 }
 
-gboolean chat_ui (const gchar *rev_username){
+void chat_ui_init (){
     gtk_init (NULL, NULL);
-    strcpy(username, rev_username);
-
     builder = gtk_builder_new_from_file ("chat_ui.glade");
 
     window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
     g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    GtkWidget *send_button = GTK_WIDGET(gtk_builder_get_object(builder, "send_button"));
-    g_signal_connect (G_OBJECT(send_button), "clicked", G_CALLBACK(send_button_press), NULL);
+    friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
+
 
     GtkWidget *add_friend_button = GTK_WIDGET (gtk_builder_get_object(builder, "add_friend_button"));
     g_signal_connect (G_OBJECT(add_friend_button), "clicked", G_CALLBACK(add_friend), NULL);
 
-    GtkWidget *tmp_button = GTK_WIDGET (gtk_builder_get_object(builder, "tmp_button"));
-    g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(tmp), NULL);
+    // GtkWidget *tmp_button = GTK_WIDGET (gtk_builder_get_object(builder, "tmp_button"));
+    // g_signal_connect_swapped (G_OBJECT(tmp_button), "clicked", G_CALLBACK(tmp), NULL);
+}
 
-    memset(chat_friend_name, 0, sizeof(chat_friend_name));
+void chat_ui (const char *rev_username){
+    chat_ui_init ();
 
-    load_friends_list();
+    strcpy (username, rev_username);
+    memset (cur_chat_friend_name, 0, sizeof(cur_chat_friend_name));
 
-    gtk_widget_show_all(window);
-    gtk_main();
-    return TRUE;
+    GtkWidget *username_label = GTK_WIDGET(gtk_builder_get_object(builder, "username_label"));
+    gtk_label_set_text ((GtkLabel *)username_label, username);
+
+    load_friends_list ();
+
+    GtkWidget *type_overlay = GTK_WIDGET(gtk_builder_get_object(builder, "type_overlay"));
+    GtkWidget *send_button = gtk_button_new_with_label ("Send");
+    g_signal_connect (G_OBJECT(send_button), "clicked", G_CALLBACK(send_button_press), NULL);
+    
+    gtk_widget_set_halign (send_button, GTK_ALIGN_END);
+    gtk_widget_set_valign (send_button, GTK_ALIGN_END);
+
+    gtk_widget_set_margin_end (send_button, 5);
+    gtk_widget_set_margin_bottom (send_button, 5);
+    // gtk_widget_set_margin_end (send_button);
+
+    gtk_widget_set_size_request (send_button, 105, 53);
+
+    gtk_overlay_add_overlay ((GtkOverlay *)type_overlay, send_button);
+
+    gtk_widget_show_all (window);
+    gtk_main ();
 }
