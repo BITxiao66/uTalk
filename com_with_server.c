@@ -10,9 +10,8 @@ gboolean build_chat_with_server(const gchar *chat_friend_name){
 }
 
 gboolean request_friends_list_from_server(gchar *username, gint *friends_num, gchar *friends_list[]){
-    *friends_num = 3;
+    *friends_num = 2;
     friends_list[0] = "ABC";
     friends_list[1] = "xyz";
-    friends_list[2] = "aaa";
     return TRUE;
 }
