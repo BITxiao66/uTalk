@@ -321,10 +321,9 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="v_add_friend_menuitem">
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">模拟添加好友</property>
                       </object>
                     </child>
                     <child>
@@ -341,6 +340,28 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">模拟好友请求被处理</property>
                         <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu5">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkMenuItem" id="v_friend_request_ac_menuitem">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">接受</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="v_friend_request_ref_menuitem">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">拒绝</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

@@ -1,5 +1,4 @@
 #include <gtk/gtk.h>
-#include "fake_msg_server.h"
 
 int send_msg_to_server (const char *chat_friend_name, const char *msg){
 	return TRUE;

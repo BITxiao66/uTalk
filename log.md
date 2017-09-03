@@ -18,13 +18,14 @@
 - 菜单 OK
 
 - 更新好友列表bug OK
-- 加好友接口
+- 加好友接口 OK
+- 加好友界面更新
 
-- ui log g_print
 
 - textviev文字样式
 - label文字样式
 
+- ui log g_print
 
 - 表情
 - 传文件
