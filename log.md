@@ -11,15 +11,19 @@
 - 滚动条 OK
 - 发送按钮 OK
 
+- 整体布局
+    - right_paned 向上调整 OK
+    - 用户头像间隔 OK
+    - 好友列表间隔 OK
+
+- 菜单
+
 - textviev文字样式
 - label文字样式
 
 - 加好友
 
-- 整体布局
-    - right_paned 向上调整
 
-- 菜单
 
 - 表情
 - 传文件
