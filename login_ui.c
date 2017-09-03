@@ -40,6 +40,7 @@ void signin_button_on_click(GtkWidget *widget, struct LOGIN_MASSAGE* login_massa
     if(send_login(username, password) == 0)
     {
         puts(" yes");
+        gtk_widget_hide(login_window);
         if(chat_ui (username) == 0)
         {
             puts("failed to open main_ui!");
