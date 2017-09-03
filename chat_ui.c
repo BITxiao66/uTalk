@@ -1,10 +1,8 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stdlib.h>
-#include "error_dialog_ui.h"
 #include "chat_ui.h"
 #include "fake_msg_server.h"
-// #include "msg_server.h"
 
 GtkBuilder *builder;
 GtkWidget *window;

@@ -5,6 +5,8 @@
         "chat_ui.h": "c",
         "com_with_server.h": "c",
         "fake_com_with_server.h": "c",
-        "fake_msg_server.h": "c"
+        "fake_msg_server.h": "c",
+        "string.h": "c",
+        "stdlib.h": "c"
     }
 }
