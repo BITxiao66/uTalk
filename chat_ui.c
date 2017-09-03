@@ -1,7 +1,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <stdlib.h>
-#include "com_with_server.h"
+#include "fake_com_with_server.h"
 #include "error_dialog_ui.h"
 #include "chat_ui.h"
 // #include "msg_server.h"
