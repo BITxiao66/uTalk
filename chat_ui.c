@@ -268,7 +268,7 @@ void chat_ui_init (){
     g_signal_connect (G_OBJECT(add_friend_menuitem), "activate", G_CALLBACK(add_friend_ui), NULL);
 }
 
-void chat_ui (const char *rev_username){
+gboolean chat_ui (const char *rev_username){
     strcpy (username, rev_username);
     memset (cur_chat_friend_name, 0, sizeof(cur_chat_friend_name));
 
@@ -278,4 +278,5 @@ void chat_ui (const char *rev_username){
 
     gtk_widget_show_all (window);
     gtk_main ();
+    return TRUE;
 }
