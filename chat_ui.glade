@@ -45,7 +45,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button2">
+              <object class="GtkButton" id="search_button">
                 <property name="label" translatable="yes">查找</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -154,11 +154,12 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="button1">
-            <property name="label" translatable="yes">搜索</property>
+          <object class="GtkButton" id="add_friend_button">
+            <property name="label" translatable="yes">添加好友</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="xalign">0.50999999046325684</property>
           </object>
           <packing>
             <property name="expand">False</property>

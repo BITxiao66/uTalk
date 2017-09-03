@@ -20,6 +20,8 @@
 - 更新好友列表bug OK
 - 加好友接口
 
+- ui log g_print
+
 - textviev文字样式
 - label文字样式
 
@@ -33,11 +35,13 @@
 
 ## 主界面接口
 - 调用别人的
-    - 加载好友列表和离线消息 gboolean request_friends_list_from_server(const gchar *username, gint *friends_num, const gchar *friends_list[], gchar *msg_list[]);
-    - 发送消息　gboolean send_msg_to_server(const gchar *friend_name, const gchar *msg);
-    - 选定好友，加载离线消息　gint request_offline_msg_from_server(const gchar *friend_name, const gchar *offline_msg[]);
-    - 搜索好友　gint search_friends_from_server(const gchar *friend_name);
+    - 加载好友列表和离线消息 gboolean request_friends_list_to_server (const gchar *username, gint *friends_num, const gchar *friends_list[], gchar *msg_list[]);
+    - 选定好友，加载消息　gboolean request_friend_msg_to_server (const gchar *friend_name, const gint *msg_num, const gint *from[], const gchar *msg[])
+    - 发送消息　gboolean send_msg_to_server (const gchar *friend_name, const gchar *msg);
+
+    - 搜索好友　gboolean search_friends_to_server (const char *search_string, const gint *friends_num, const gchar *friends_name[]);
     - 发出好友请求　gboolean send_friend_request_to_server(const_gchar *friend_name);
+
 - 别人调用自己的
     - 启动主界面 gboolean chat_ui(const gchar *username);
     - 收到消息　void receive_msg_from_server(const gchar *friend_name, const gchar *msg);
