@@ -1,5 +1,6 @@
 #include <gtk/gtk.h>
 #include <string.h>
+#include <stdlib.h>
 #include "com_with_server.h"
 #include "error_dialog_ui.h"
 #include "chat_ui.h"
@@ -16,8 +17,8 @@ typedef struct{
     GtkWidget *avator_image, *name_label, *msg_label;
 } FriendItem;
 
-void update_msg_textview(const gchar *name, const gchar *msg){
-    GtkWidget * msg_textview = GTK_WIDGET(gtk_builder_get_object(builder, "msg_textview"));
+void update_msg_textview (const gchar *name, const gchar *msg){
+    GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object(builder, "msg_textview"));
     GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW (msg_textview));
 
     GtkTextIter end;
@@ -49,7 +50,45 @@ void receive_msg_from_server (const char *friend_name, const char *msg){
     }
 }
 
-gchar *get_type_textview_msg(){
+void v_rev_msg (GtkWidget *widget, gpointer *data){
+    receive_msg_from_server ("DaDax", "Hello");
+}
+
+void receive_friend_request_from_server (const char *friend_name){
+    gchar *msg = "有用户请求添加您为好友";
+    GtkWidget *msgdialog = gtk_message_dialog_new (GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", msg);
+    gtk_window_set_title(GTK_WINDOW(msgdialog), "Friend Request");
+    gtk_dialog_run(GTK_DIALOG(msgdialog));
+    gtk_widget_destroy(msgdialog);
+    add_friend (friend_name);
+}
+
+void v_rev_friend_request (GtkWidget *widget, gpointer *data){
+    receive_friend_request_from_server ("xuda");
+}
+
+void receive_friend_request_response_from_server (const char *friend_name, const int result){
+    const gchar *msg = result ? "用户同意了您的好友请求" : "用户拒绝了您的好友请求";
+    GtkWidget *msgdialog = gtk_message_dialog_new (GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "%s", msg);
+    gtk_window_set_title(GTK_WINDOW(msgdialog), "Friend Request Response");
+    gtk_dialog_run(GTK_DIALOG(msgdialog));
+    gtk_widget_destroy(msgdialog);
+    add_friend (friend_name);
+}
+
+void v_rev_friend_request_response (GtkWidget *widget, gpointer *data){
+    receive_friend_request_response_from_server ("xuda", 1);
+}
+
+void add_friend_ui (){
+    g_print ("add friend!\n");
+    GtkWidget *add_friend_window = GTK_WIDGET (gtk_builder_get_object(builder, "add_friend_window"));
+
+
+    gtk_widget_show_all (add_friend_window);
+}
+
+gchar *get_type_textview_msg (){
     GtkWidget * type_textview = GTK_WIDGET (gtk_builder_get_object(builder, "type_textview"));
     GtkTextBuffer * type_textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (type_textview));
     
@@ -62,7 +101,7 @@ gchar *get_type_textview_msg(){
     return msg;
 }
 
-void send_button_press(GtkWidget *widget, gpointer *data){
+void send_button_press (GtkWidget *widget, gpointer *data){
     // 1. Get cur_chat_friend_name and the message
     if (strcmp(cur_chat_friend_name, "") == 0){
         return;
@@ -108,7 +147,7 @@ void uTalk_friend_selected (GtkWidget *name_label, GtkWidget *widget){
     }
 }
 
-GtkWidget *uTalk_friend_new (gchar *avator_path, gchar *friend_name, gchar *msg, FriendItem *friend_item){
+GtkWidget *uTalk_friend_new (gchar *avator_path, const gchar *friend_name, gchar *msg, FriendItem *friend_item){
     // Get avator image
     GtkWidget *avator_image = gtk_image_new_from_file (avator_path);
     
@@ -155,11 +194,19 @@ GtkWidget *uTalk_friend_new (gchar *avator_path, gchar *friend_name, gchar *msg,
     return friend_eventbox;
 }
 
-void add_friend (GtkWidget *widget, gpointer *data){
-    FriendItem friend_item;
-    GtkWidget *friend = uTalk_friend_new("dada.jpg", "DaDax", "offline msg", &friend_item);
+void add_friend (const gchar *friend_name){
+    FriendItem *friend_item = (FriendItem *)malloc (sizeof(FriendItem));
+    GtkWidget *friend = uTalk_friend_new("dada.jpg", friend_name, "Hello, let's talk!", friend_item);
     gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, 0);
-    friends_list = g_list_insert ((GList *)friends_list, &friend_item, 0);
+    friends_list = g_list_insert ((GList *)friends_list, friend_item, 0);
+    gtk_widget_show_all (friends_listbox);
+}
+
+void v_add_friend (GtkWidget *widget, gpointer *data){
+    FriendItem *friend_item = (FriendItem *)malloc (sizeof(FriendItem));
+    GtkWidget *friend = uTalk_friend_new("dada.jpg", "DaDax", "last msg", friend_item);
+    gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, 0);
+    friends_list = g_list_insert ((GList *)friends_list, friend_item, 0);
     gtk_widget_show_all (friends_listbox);
 }
 
@@ -171,12 +218,11 @@ void load_friends_list(){
         error_dialog (window, "Connet faild!");
         return;
     }
-    GtkWidget *friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
     for (int i = 0; i < friends_num; i++){
-        FriendItem friend_item;
-        GtkWidget *friend = uTalk_friend_new("dada.jpg", friends_name_list[i], friends_msg_list[i], &friend_item);
+        FriendItem *friend_item = (FriendItem *)malloc (sizeof(FriendItem));
+        GtkWidget *friend = uTalk_friend_new("dada.jpg", friends_name_list[i], friends_msg_list[i], friend_item);
         gtk_list_box_insert ((GtkListBox *)friends_listbox, friend, -1);
-        friends_list = g_list_insert ((GList *)friends_list, &friend_item, -1);
+        friends_list = g_list_insert ((GList *)friends_list, friend_item, -1);
     }
 }
 
@@ -188,6 +234,9 @@ void chat_ui_init (){
     g_signal_connect (G_OBJECT(window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
     friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
+
+    GtkWidget *username_label = GTK_WIDGET(gtk_builder_get_object(builder, "username_label"));
+    gtk_label_set_text ((GtkLabel *)username_label, username);
 
     GtkWidget *type_overlay = GTK_WIDGET(gtk_builder_get_object(builder, "type_overlay"));
     GtkWidget *send_button = gtk_button_new_with_label ("发送");
@@ -204,10 +253,19 @@ void chat_ui_init (){
     g_signal_connect (G_OBJECT(quit_menuitem), "activate", G_CALLBACK(gtk_main_quit), NULL);
 
     GtkWidget *v_add_friend_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "v_add_friend_menuitem"));
-    g_signal_connect (G_OBJECT(v_add_friend_menuitem), "activate", G_CALLBACK(add_friend), NULL);
-    
-    GtkWidget *username_label = GTK_WIDGET(gtk_builder_get_object(builder, "username_label"));
-    gtk_label_set_text ((GtkLabel *)username_label, username);
+    g_signal_connect (G_OBJECT(v_add_friend_menuitem), "activate", G_CALLBACK(v_add_friend), NULL);
+
+    GtkWidget *v_rev_msg_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "v_rev_msg_menuitem"));
+    g_signal_connect (G_OBJECT(v_rev_msg_menuitem), "activate", G_CALLBACK(v_rev_msg), NULL);
+
+    GtkWidget *v_rev_friend_request_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "v_rev_friend_request_menuitem"));
+    g_signal_connect (G_OBJECT(v_rev_friend_request_menuitem), "activate", G_CALLBACK(v_rev_friend_request), NULL);
+
+    GtkWidget *v_rev_friend_request_response_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "v_rev_friend_request_response_menuitem"));
+    g_signal_connect (G_OBJECT(v_rev_friend_request_response_menuitem), "activate", G_CALLBACK(v_rev_friend_request_response), NULL);
+
+    GtkWidget *add_friend_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "add_friend_menuitem"));
+    g_signal_connect (G_OBJECT(add_friend_menuitem), "activate", G_CALLBACK(add_friend_ui), NULL);
 }
 
 void chat_ui (const char *rev_username){

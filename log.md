@@ -15,14 +15,13 @@
     - right_paned 向上调整 OK
     - 用户头像间隔 OK
     - 好友列表间隔 OK
+- 菜单 OK
 
-- 菜单
+- 更新好友列表bug OK
+- 加好友接口
 
 - textviev文字样式
 - label文字样式
-
-- 加好友
-
 
 
 - 表情
@@ -40,7 +39,7 @@
     - 搜索好友　gint search_friends_from_server(const gchar *friend_name);
     - 发出好友请求　gboolean send_friend_request_to_server(const_gchar *friend_name);
 - 别人调用自己的
-    - 启动主界面 gboolean chat_ui(const gchar *username, const gchar *password);
+    - 启动主界面 gboolean chat_ui(const gchar *username);
     - 收到消息　void receive_msg_from_server(const gchar *friend_name, const gchar *msg);
     - 收到好友请求 gboolean receive_friend_request_from_server(const gchar *friend_name);
     - 发出的好友申请被处理 receive_friend_request_response_from_server(gboolean result);

@@ -12,8 +12,8 @@ gboolean build_chat_with_server(const gchar *chat_friend_name){
 gboolean request_friends_list_from_server(gchar *username, gint *friends_num, gchar *friends_list[], gchar *msg_list[]){
     *friends_num = 2;
     friends_list[0] = "ABC";
-    msg_list[0] = "offline msg";
+    msg_list[0] = "last msg";
     friends_list[1] = "xyz";
-    msg_list[1] = "offline msg";
+    msg_list[1] = "last msg";
     return TRUE;
 }
