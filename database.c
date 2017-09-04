@@ -284,5 +284,66 @@ int if_user_exist(const char* line)
     return 1;
 }
 
+/********************************************************************************
+Description : add friend in database
+Prameter    : Function done
+Return      : void
+Side effect : none
+Author      : sunjinda
+Date        : 2017.09.04
+Time        : 08:12:00
+********************************************************************************/
+void insert_friend_into_database(const char* name1,const char* name2)
+{
+    //making connection
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    conn = mysql_init(NULL);
+    if (!mysql_real_connect(conn, server,user, password, database, 0, NULL, 0)) 
+    {
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        exit(1);
+    }
 
+    //check if the username exit
+    char comm[1024];
+    int ans=0;
+    sprintf(comm,"select * from friend_list where p1 = '%s' and p2 = '%s';",name1,name2);
+    if (mysql_query(conn,comm))
+    {
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        exit(1);
+    }
+    res = mysql_use_result(conn); 
+    while ((row = mysql_fetch_row(res)) != NULL)
+    {
+        //printf("%s %s\n", row[0],row[1]); //remember the output number!!
+        ans++;        
+    }
+    if(ans!=0)                            //if user_name exist!
+    {
+        mysql_free_result(res);
+        mysql_close(conn);
+        return ;
+    }
+    else  //start insertion
+    {
+        char comm1[1024] ="\0";
+        sprintf(comm1,"insert into friend_list values ('%s','%s');",name1,name2);
+        if (mysql_query(conn,comm1))
+        {
+            fprintf(stderr, "%s\n", mysql_error(conn));
+            //exit(1);
+        }
+        char comm2[1024] ="\0";
+        sprintf(comm1,"insert into friend_list values ('%s','%s');",name2,name1);
+        if (mysql_query(conn,comm1))
+        {
+            fprintf(stderr, "%s\n", mysql_error(conn));
+            //exit(1);
+        }
+    }
+    return;
+}
 
