@@ -28,3 +28,4 @@ int check_signup(const char* line);
 int check_login(const char* line);
 void alluser_clean();
 int if_user_exist(const char* line);
+void insert_friend_into_database(const char* name1,const char* name2);

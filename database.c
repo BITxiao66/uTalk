@@ -263,7 +263,7 @@ int if_user_exist(const char* line)
    
     //start deletion
     char comm[1024] ="\0";
-    sprintf(comm,"select * from alluser where usernamr = '%s';",line);
+    sprintf(comm,"select * from alluser where username = '%s';",line);
     if (mysql_query(conn,comm))
     {
         fprintf(stderr, "%s\n", mysql_error(conn));
@@ -352,3 +352,46 @@ void insert_friend_into_database(const char* name1,const char* name2)
     return;
 }
 
+/********************************************************************************
+Description : get frirnd list
+Prameter    : Function done
+Return      : int (number of friends)
+Side effect : none
+Author      : sunjinda
+Date        : 2017.09.04
+Time        : 10:43:00
+********************************************************************************/
+int get_friend_list_from_db(const char* name,char* list)
+{
+    //making connection
+    MYSQL *conn;
+    MYSQL_RES *res;
+    MYSQL_ROW row;
+    conn = mysql_init(NULL);
+    if (!mysql_real_connect(conn, server,user, password, database, 0, NULL, 0)) 
+    {
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        exit(1);
+    }
+
+    //check if the username exit
+    char comm[1024],line[2000];
+    memset(line,0,sizeof(line));
+    int ans=0;
+    sprintf(comm,"select p2 from friend_list where p1 = '%s';",name);
+    if (mysql_query(conn,comm))
+    {
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        exit(1);
+    }
+    res = mysql_use_result(conn); 
+    while ((row = mysql_fetch_row(res)) != NULL)
+    {
+        printf("%s\n", row[0]); //remember the output number!!
+        ans++; 
+        strcat(line,row[0]);
+        strcat(line,"\n");
+    }
+    strcat(line,0);
+    return ans;
+}
