@@ -45,7 +45,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="button2">
+              <object class="GtkButton" id="search_button">
                 <property name="label" translatable="yes">查找</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -65,7 +65,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkListBox" id="listbox1">
+          <object class="GtkListBox" id="found_friends_listbox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -75,18 +75,30 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <child>
-                  <object class="GtkEventBox" id="eventbox1">
+                  <object class="GtkBox" id="box3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
+                    <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkBox" id="box3">
+                      <object class="GtkSeparator" id="separator1">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="orientation">vertical</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox" id="box4">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkSeparator" id="separator1">
+                          <object class="GtkImage" id="image2">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="pixbuf">dada.jpg</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -95,52 +107,34 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox" id="box4">
+                          <object class="GtkLabel" id="found_friend_name_label">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <child>
-                              <object class="GtkImage" id="image2">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="pixbuf">dada.jpg</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkLabel" id="label2">
-                                <property name="visible">True</property>
-                                <property name="can_focus">False</property>
-                                <property name="label" translatable="yes">label</property>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">True</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkSeparator" id="separator3">
-                            <property name="visible">True</property>
-                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">xuda</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
-                            <property name="position">2</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkSeparator" id="separator3">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
                     </child>
                   </object>
                 </child>
@@ -154,11 +148,12 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="button1">
-            <property name="label" translatable="yes">搜索</property>
+          <object class="GtkButton" id="add_friend_button">
+            <property name="label" translatable="yes">添加好友</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
+            <property name="xalign">0.50999999046325684</property>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -320,10 +315,9 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkMenuItem" id="v_add_friend_menuitem">
+                      <object class="GtkSeparatorMenuItem" id="separatormenuitem2">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="label" translatable="yes">模拟添加好友</property>
                       </object>
                     </child>
                     <child>
@@ -340,6 +334,28 @@
                         <property name="can_focus">False</property>
                         <property name="label" translatable="yes">模拟好友请求被处理</property>
                         <property name="use_underline">True</property>
+                        <child type="submenu">
+                          <object class="GtkMenu" id="menu5">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <child>
+                              <object class="GtkMenuItem" id="v_friend_request_ac_menuitem">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">接受</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkMenuItem" id="v_friend_request_ref_menuitem">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">拒绝</property>
+                                <property name="use_underline">True</property>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>
@@ -392,7 +408,7 @@
             <property name="position_set">True</property>
             <child>
               <object class="GtkBox" id="left_box">
-                <property name="width_request">250</property>
+                <property name="width_request">240</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">baseline</property>
@@ -671,7 +687,7 @@
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">toolbutton1</property>
                                 <property name="use_underline">True</property>
-                                <property name="stock_id">gtk-info</property>
+                                <property name="stock_id">gtk-open</property>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
