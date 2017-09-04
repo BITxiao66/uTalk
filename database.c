@@ -353,7 +353,7 @@ void insert_friend_into_database(const char* name1,const char* name2)
 }
 
 /********************************************************************************
-Description : get frirnd list
+Description : get friend list
 Prameter    : Function done
 Return      : int (number of friends)
 Side effect : none
