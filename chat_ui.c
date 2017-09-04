@@ -6,6 +6,7 @@
 #include "friendbox_struct.h"
 #include "msg_queue.h"
 
+// #include "test0904.h"
 #include "virtual_msg_server.h"
 
 GtkBuilder *builder;
@@ -55,6 +56,7 @@ void update_msg_textview (const gchar *name, const gchar *msg){
 
 void refresh_friendbox_with_msg (GtkWidget *friendbox, Msg_queue *msg_queue){
 	Message *message = Msg_queue_front (msg_queue);
+	Msg_queue_pop (msg_queue);
 	const gchar *msg = message->text;
 	utalk_friendbox_with_msg_set_msg (friendbox, msg);
 }
@@ -101,12 +103,12 @@ void v_rev_friend_request (GtkWidget *widget, gpointer data){
 	receive_friend_request_from_server ("xuda");
 }
 
-void add_friend (const gchar *friend_name, const gchar *msg, gint position){
+void add_friend (const char *friend_name, const char *msg, int position){
 	GtkWidget *friendbox_with_msg = utalk_friendbox_with_msg_new ("dada.jpg", friend_name, msg);
 	gtk_list_box_insert ((GtkListBox *)friends_listbox, friendbox_with_msg, position);
 	Msg_queue *msg_queue = Msg_queue_new ();
 	Message *message = Message_new (friend_name, msg);
-	Msg_queue_push (msg_queue, message);
+	// Msg_queue_push (msg_queue, message);
 	FriendItem *frienditem = utalk_frienditem_new (friend_name, friendbox_with_msg, msg_queue);
 	friends_list = g_list_insert (friends_list, frienditem, position);
 }
@@ -162,6 +164,12 @@ void add_friend_button_press (GtkWidget *widget, gpointer data){
 	GtkWidget *friendbox = (GtkWidget *)(gtk_container_get_children ((GtkContainer *)row)->data);
 	const gchar *name = utalk_friendbox_get_name (friendbox);
 	g_print ("%s\n", name);
+
+	gboolean succeed = send_friend_request_to_server (name);
+	if (succeed == FALSE){
+		server_error_dialog (window);
+		return;
+	}
 
 	gchar *msg1 = "向";
 	gchar *msg2 = "的好友申请已发送。";

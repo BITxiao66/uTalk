@@ -34,6 +34,7 @@ void Msg_queue_pop (Msg_queue *msg_queue){
     Message *msg = msg_queue->head->next;
     msg_queue->head->next = msg->next;
     if (msg->next) msg->next->prev = msg_queue->head;
+    if (msg == msg_queue->tail) msg_queue->tail = msg_queue->head;
     free(msg);
     msg_queue->num--;
 }
