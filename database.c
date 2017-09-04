@@ -47,7 +47,12 @@ void create_tables()
         fprintf(stderr, "%s\n", mysql_error(conn));
         //exit(1);
     }
-    
+    if (mysql_query(conn,"create table if not exists friend_list (p1 char(20),p2 char(20));"))
+    {
+        fprintf(stderr, "%s\n", mysql_error(conn));
+        //exit(1);
+    }
+
     //ending
     mysql_free_result(res);
     mysql_close(conn);
