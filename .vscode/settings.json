@@ -7,6 +7,8 @@
         "fake_com_with_server.h": "c",
         "fake_msg_server.h": "c",
         "string.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "msg_queue.h": "c",
+        "friendbox_struct.h": "c"
     }
 }

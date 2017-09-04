@@ -4,11 +4,11 @@ int send_msg_to_server (const char *chat_friend_name, const char *msg){
 	return TRUE;
 }
 
-int request_friends_list_to_server (char *username, int *friends_num, char *friends_list[], char *msg_list[]){
+int request_friends_list_to_server (char *username, int *friends_num, const char *friends_list[], const char *msg_list[]){
 	*friends_num = 2;
-	friends_list[0] = "ABC";
+	friends_list[0] = "xuda";
 	msg_list[0] = "last msg";
-	friends_list[1] = "xyz";
+	friends_list[1] = "shaw";
 	msg_list[1] = "last msg";
 	return TRUE;
 }
