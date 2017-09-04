@@ -338,7 +338,7 @@ void insert_friend_into_database(const char* name1,const char* name2)
         }
         char comm2[1024] ="\0";
         sprintf(comm2,"insert into friend_list values ('%s','%s');",name2,name1);
-        if (mysql_query(conn,comm1))
+        if (mysql_query(conn,comm2))
         {
             fprintf(stderr, "%s\n", mysql_error(conn));
             //exit(1);
