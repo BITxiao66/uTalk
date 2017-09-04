@@ -48,3 +48,30 @@
     - 收到消息　void receive_msg_from_server(const gchar *friend_name, const gchar *msg);
     - 收到好友请求 gboolean receive_friend_request_from_server(const gchar *friend_name);
     - 发出的好友申请被处理 receive_friend_request_response_from_server(gboolean result);
+
+## Monday
+
+- morning
+    - 加好友
+    - 收发消息
+- afternoon
+    - 加载好友列表
+    - 传送头像（图片）
+- evening
+    - 传文件
+    - 加载最近消息
+    - 加载聊天记录
+
+## Tuesday
+
+- 群聊 今晚进一步细化
+
+## Wedesday
+
+- morning
+    - 把服务端架在远程服务器
+- afternoon
+    - 每个人再次整理代码，整理出思维导图
+    - 准备答辩演示流程，做PPT
+- evening
+    - 反复演练答辩流程

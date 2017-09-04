@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "chat_ui.h"
+#include "friendbox_struct.h"
 #include "virtual_msg_server.h"
 
 GtkBuilder *builder;
@@ -62,13 +63,14 @@ void v_rev_msg (GtkWidget *widget, gpointer data){
 	receive_msg_from_server ("DaDax", "Hello");
 }
 
-void receive_friend_request_from_server (const char *friend_name){
+int receive_friend_request_from_server (const char *friend_name){
 	gchar *msg = "有用户请求添加您为好友";
 	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", msg);
 	gtk_window_set_title(GTK_WINDOW(dialog), "Friend Request");
 	gtk_dialog_run(GTK_DIALOG(dialog));
 	gtk_widget_destroy(dialog);
 	add_friend (friend_name);
+	return 1;
 }
 
 void v_rev_friend_request (GtkWidget *widget, gpointer data){
