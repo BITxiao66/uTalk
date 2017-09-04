@@ -193,8 +193,8 @@ int if_user_exist(const char* line)
     conn = mysql_init(NULL);
     if (!mysql_real_connect(conn, server,user, password, database, 0, NULL, 0)) 
     {
-        fprintf(stderr, "%s\n", mysql_error(conn));
-        exit(1);
+        //fprintf(stderr, "%s\n", mysql_error(conn));
+        //exit(1);
     }
    
     //start deletion
@@ -202,8 +202,8 @@ int if_user_exist(const char* line)
     sprintf(comm,"select * from alluser where username = '%s';",line);
     if (mysql_query(conn,comm))
     {
-        fprintf(stderr, "%s\n", mysql_error(conn));
-        exit(1);
+        //fprintf(stderr, "%s\n", mysql_error(conn));
+        //exit(1);
     }
     int ans=0;
     res = mysql_use_result(conn); 
@@ -361,22 +361,6 @@ int if_user_online(const char *name)
             self_name[i]=0;
             strcpy(online_user[current_userID],self_name);
 
-            /*strcpy(temp,"offline_msg/");
-            strcat(temp,self_name);
-            p_offline_msg=fopen(temp,"r");
-
-            p_msg_to_slef[0]=0;
-            while(fgets(temp,99,p_offline_msg))
-            {
-                strcat(p_msg_to_slef,temp);
-            }
-            fclose(p_offline_msg);
-
-            strcpy(temp,"offline_msg/");
-            strcat(temp,self_name);
-            p_offline_msg=fopen(temp,"w");
-            fclose(p_offline_msg);*/
-
             printf("%s had log in\n",self_name);
         }
         else                             
@@ -408,11 +392,11 @@ int if_user_online(const char *name)
             strcpy(p_msg_to_slef,"-1");
         }
     }
-    else if(original_msg[1]=='2')
+    else if(original_msg[1]=='2')                //get friend list
     {
 
     }
-    else if(original_msg[1]=='3')
+    else if(original_msg[1]=='3')                //add friend
     {
         if(original_msg[3]=='0')
         {
@@ -441,7 +425,7 @@ int if_user_online(const char *name)
     
                 strcpy(p_msg_to_opp,"/3:2,");
                 strcat(p_msg_to_opp,online_user[current_userID]);
-                printf("%s",p_msg_to_opp);
+                
                 strcat(p_msg_to_opp,"*");
             }
         }
@@ -511,7 +495,7 @@ int if_user_online(const char *name)
             }
         }
     }
-    else if(original_msg[1]=='4')
+    else if(original_msg[1]=='4')                //get offline msg
     {
         *p_to_sockfd=0;
         
@@ -531,6 +515,22 @@ int if_user_online(const char *name)
         strcat(temp,online_user[current_userID]);
         p_offline_msg=fopen(temp,"w");
         fclose(p_offline_msg);
+    }
+    else if(original_msg[1]=='5')                //if friend exist
+    {
+        *p_to_sockfd=0;
+        strcpy(temp,original_msg+4);
+        len=strlen(temp);
+        temp[len-1]=0;
+
+        if(if_user_exist(temp))
+        {
+            strcpy(p_msg_to_slef,"0");           //user exist
+        }
+        else
+        {
+            strcpy(p_msg_to_slef,"-1");
+        }
     }
  }
 
@@ -647,60 +647,11 @@ int if_user_online(const char *name)
             if(buf[0]=='/')
             {
                 process_command(&opposite_user_sockfd,current_user_ID,msg_to_self,msg_to_opp,buf);
-                printf("%s",msg_to_self);
                 send(current_user_sockfd,msg_to_self,strlen(msg_to_self),0);
-                //send(current_user_sockfd,"0",strlen("0"),0);
                 if(opposite_user_sockfd>0)
                 {
                     send(opposite_user_sockfd,msg_to_opp,strlen(msg_to_opp),0);
                 }
-                /*if(buf[1]=='0')                      //log in
-                {
-                    if(check_login(buf+3))           //log in success
-                    {
-                        send(current_user_sockfd,"0",strlen("0"),0);
-                    }
-                    else                             
-                    {
-                        send(current_user_sockfd,"-1",strlen("-1"),0);
-                        while(1)
-                        {
-                            recv(current_user_sockfd, buf, 100, 0);
-                            if(check_login(buf+3))
-                            {
-                                send(current_user_sockfd,"0",strlen("0"),0);
-                                break;
-                            }
-                            else
-                            {
-                                send(current_user_sockfd,"-1",strlen("-1"),0);
-                            }
-                        }
-                    }
-                }
-                else if(buf[1]=='1')                 //sign up
-                {
-                    if(check_signup(buf+3))          //sign up success
-                    {
-                        send(current_user_sockfd,"0",strlen("0"),0);
-                    }
-                    else
-                    {
-                        send(current_user_sockfd,"-1",strlen("-1"),0);
-                    }
-                }
-                else if(buf[1]=='2')                           //get name
-                {
-                    for(i=0;i<100&&buf[i+3]!=';';i++)
-                        temp[i]=buf[i+3];
-                    temp[i]=0;
-                    strcpy(online_user[current_user_ID],temp);
-                    printf("%s had log in\n",temp);
-                }
-                else                                 //invalid 
-                {
-                    send(current_user_sockfd,"Invalid command",strlen("Invalid command"),0);
-                }*/
             }
             else
             {
@@ -710,24 +661,6 @@ int if_user_online(const char *name)
                 {
                     send(opposite_user_sockfd,msg_to_opp,strlen(msg_to_opp),0);
                 }
-                /*for(i=0;i<100&&buf[i]!=':';i++)
-                    to_who[i]=buf[i];
-                to_who[i]=0;
-
-                if(if_user_online(to_who)==-1)
-                {
-                    send(current_user_sockfd,"User not online",strlen("User not online"),0);
-                }
-                else
-                {
-                    strcpy(send_msg,online_user[current_user_ID]);
-                    strcat(send_msg,":");
-                    strcat(send_msg,buf+i);
-                    //send(ary_sockfd[if_user_online(to_who)],online_user[current_user_ID],strlen(online_user[current_user_ID]),0);
-                    //send(ary_sockfd[if_user_online(to_who)],buf+i,strlen(buf+i),0);
-                    send(ary_sockfd[if_user_online(to_who)],send_msg,strlen(send_msg),0);
-                    //send(current_user_sockfd,"msg had sent to friend",strlen("msg had sent to friend"),0);
-                }*/
 
             }
         }
