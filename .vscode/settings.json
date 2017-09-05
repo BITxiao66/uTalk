@@ -9,6 +9,10 @@
         "string.h": "c",
         "stdlib.h": "c",
         "msg_queue.h": "c",
-        "friendbox_struct.h": "c"
+        "friendbox_struct.h": "c",
+        "con_server.h": "c",
+        "regist_ui.h": "c",
+        "login_ui.h": "c",
+        "chat.h": "c"
     }
 }

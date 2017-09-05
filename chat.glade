@@ -2,13 +2,14 @@
 <!-- Generated with glade 3.18.3 -->
 <interface>
   <requires lib="gtk+" version="3.12"/>
-  <object class="GtkWindow" id="add_friend_window">
+  <object class="GtkWindow" id="addfriend_window">
     <property name="width_request">500</property>
     <property name="height_request">700</property>
     <property name="can_focus">False</property>
     <property name="border_width">7</property>
     <property name="title" translatable="yes">添加好友</property>
     <property name="window_position">center</property>
+    <property name="type_hint">dialog</property>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
@@ -28,6 +29,7 @@
         </child>
         <child>
           <object class="GtkBox" id="box2">
+            <property name="height_request">60</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -40,7 +42,7 @@
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="fill">False</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -53,7 +55,7 @@
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="fill">True</property>
+                <property name="fill">False</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -66,6 +68,7 @@
         </child>
         <child>
           <object class="GtkListBox" id="found_friends_listbox">
+            <property name="height_request">500</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <child>
@@ -148,17 +151,115 @@
           </packing>
         </child>
         <child>
-          <object class="GtkButton" id="add_friend_button">
-            <property name="label" translatable="yes">添加好友</property>
+          <object class="GtkBox" id="box6">
             <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">True</property>
-            <property name="xalign">0.50999999046325684</property>
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkButton" id="button1">
+                <property name="label" translatable="yes">取消</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="add_friend_button">
+                <property name="label" translatable="yes">添加好友</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="halign">center</property>
+                <property name="valign">center</property>
+                <property name="xalign">0.50999999046325684</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">3</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+  <object class="GtkWindow" id="chat_history_window">
+    <property name="width_request">500</property>
+    <property name="height_request">700</property>
+    <property name="can_focus">False</property>
+    <property name="border_width">7</property>
+    <property name="window_position">center</property>
+    <child>
+      <object class="GtkBox" id="box5">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel" id="label2">
+            <property name="height_request">50</property>
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="label" translatable="yes">历史消息</property>
+            <attributes>
+              <attribute name="scale" value="1.2"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow1">
+            <property name="height_request">570</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="resize_mode">immediate</property>
+            <property name="shadow_type">in</property>
+            <child>
+              <object class="GtkTextView" id="chat_history_textview">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="editable">False</property>
+                <property name="cursor_visible">False</property>
+                <property name="populate_all">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkButton" id="history_close_button">
+            <property name="label" translatable="yes">关闭</property>
+            <property name="width_request">90</property>
+            <property name="height_request">40</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">True</property>
+            <property name="halign">center</property>
+            <property name="valign">center</property>
+            <property name="margin_top">16</property>
+            <property name="xalign">0.5899999737739563</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
@@ -356,6 +457,14 @@
                             </child>
                           </object>
                         </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkMenuItem" id="test_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">test</property>
+                        <property name="use_underline">True</property>
                       </object>
                     </child>
                   </object>
@@ -637,6 +746,8 @@
                           <object class="GtkTextView" id="msg_textview">
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
+                            <property name="editable">False</property>
+                            <property name="cursor_visible">False</property>
                           </object>
                         </child>
                       </object>
@@ -682,7 +793,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkToolButton" id="toolbutton1">
+                              <object class="GtkToolButton" id="choose_file_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="label" translatable="yes">toolbutton1</property>
@@ -695,7 +806,7 @@
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkToolButton" id="toolbutton3">
+                              <object class="GtkToolButton" id="chat_history_button">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="halign">end</property>
