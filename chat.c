@@ -118,9 +118,15 @@ int recv_friend_request (const char *name){
 	gint result = gtk_dialog_run (GTK_DIALOG(dialog));
 	gtk_widget_destroy (dialog);
 
-	if (result == GTK_RESPONSE_NO) return 0;
+	if (result == GTK_RESPONSE_NO){
+		refuse_add_friend (name);
+		return 0;
+	}
 	add_friend (name, "Hello, let's talk!", 0);
+
+	friends_listbox = GTK_WIDGET(gtk_builder_get_object(builder, "friends_listbox"));
 	gtk_widget_show_all (friends_listbox);
+	agree_add_friend (name);
 	return 1;
 }
 
@@ -370,5 +376,7 @@ GtkWidget *load_chat_window (const char *recv_username){
 	chat_init ();
 	load_friends_list_from_server ();
 
+	window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
+	gtk_widget_show_all (window);
 	return window;
 }
