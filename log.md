@@ -1,3 +1,22 @@
+## Fianl UI
+
+- get search text OK
+- history text view OK
+- search friend margin OK
+- text style
+- save file
+
+- group chat
+- trans avator
+- stiker
+- name margin
+
+- signin
+- test module
+
+- Second open
+
+
 ## 功能
 
 - 加载后立即做的事情 OK

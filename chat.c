@@ -63,6 +63,8 @@ void choose_file (GtkWidget *widget, gpointer data){
 // Chat history module
 
 void load_chathistory_ui (GtkWidget *widget, gpointer data){
+	if (strcmp (cur_chat_friend_name, "") == 0) return;
+
 	gchar namelist[MAX_NUM][MAX_LENGTH], msglist[MAX_NUM][MAX_LENGTH];
 	gint msg_num = request_chathistory (cur_chat_friend_name, namelist, msglist);
 	GtkWidget *chat_history_window = GTK_WIDGET (gtk_builder_get_object(builder, "chat_history_window"));
@@ -70,8 +72,16 @@ void load_chathistory_ui (GtkWidget *widget, gpointer data){
 	GtkWidget *history_close_button = GTK_WIDGET(gtk_builder_get_object(builder, "history_close_button"));
 	g_signal_connect (G_OBJECT(history_close_button), "clicked", G_CALLBACK(gtk_window_close), NULL);
 
-	GtkWidget *chat_history_textview = GTK_WIDGET(gtk_builder_get_object(builder, "chat_history_textview"));
-	GtkTextBuffer *chat_history_textbuffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW (chat_history_textview));
+	GtkWidget *chathistory_label = GTK_WIDGET(gtk_builder_get_object(builder, "chathistory_label"));
+	char text[20];
+	sprintf (text, "与 %s 的历史消息", cur_chat_friend_name);
+	gtk_label_set_text ((GtkLabel *)chathistory_label, text);
+
+	GtkTextView *text_view = (GtkTextView *)gtk_builder_get_object(builder, "chat_history_textview");
+	gtk_text_view_set_editable (text_view,	FALSE);
+	gtk_text_view_set_cursor_visible (text_view, FALSE);
+
+	GtkTextBuffer *chat_history_textbuffer = gtk_text_view_get_buffer(text_view);
 	GtkTextIter end;
 	gtk_text_buffer_get_end_iter(chat_history_textbuffer, &end);
 
@@ -131,15 +141,19 @@ void add_friend_button_clicked (GtkWidget *widget, gpointer data){
 }
 
 void search_button_clicked (GtkWidget *widget, gpointer data){
-	const gchar *text = "fihxc";
+	GtkWidget *searchentry = GTK_WIDGET(gtk_builder_get_object(builder, "searchentry"));
+	const gchar *text = gtk_entry_get_text ((GtkEntry *)searchentry);
+	g_print ("Search text = %s\n", text);
 
 	char friendlist[20][MAX_LENGTH];
 	gint friends_num = search_friends (text, friendlist);
 	
 	GtkWidget *found_friends_listbox = GTK_WIDGET(gtk_builder_get_object (builder, "found_friends_listbox"));
-	// gtk_container_foreach ((GtkContainer *)found_friends_listbox, remove_item_from_container, found_friends_listbox);
-	for (int i = 0; i < friends_num; i++)
-	{
+	GList *list = gtk_container_get_children ((GtkContainer *)found_friends_listbox);
+	for (GList *l = list; l != NULL; l = l->next){
+		gtk_container_remove ((GtkContainer *)found_friends_listbox, (GtkWidget *)(l->data));
+	}
+	for (int i = 0; i < friends_num; i++){
 		GtkWidget *friendbox = utalk_friendbox_new ("dada.jpg", friendlist[i]);
 		gtk_list_box_insert ((GtkListBox *)found_friends_listbox, friendbox, -1);
 	}
@@ -154,6 +168,9 @@ void load_addfriend_ui (){
 
 	GtkWidget *add_friend_button = GTK_WIDGET(gtk_builder_get_object(builder, "add_friend_button"));
 	g_signal_connect (G_OBJECT(add_friend_button), "clicked", G_CALLBACK(add_friend_button_clicked), NULL);
+
+	GtkWidget *chathistory_close_button = GTK_WIDGET(gtk_builder_get_object(builder, "chathistory_close_button"));
+	g_signal_connect (G_OBJECT(chathistory_close_button), "clicked", G_CALLBACK(gtk_window_close), NULL);
 
 	gtk_widget_show_all (addfriend_window);
 }
