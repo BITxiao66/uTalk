@@ -60,6 +60,38 @@ void choose_file (GtkWidget *widget, gpointer data){
 	gtk_widget_destroy (dialog);
 }
 
+void recv_file (){
+	GtkWidget *dialog = gtk_file_chooser_dialog_new ("Save File", (GtkWindow *)window ,GTK_FILE_CHOOSER_ACTION_SAVE,
+										  "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+	GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
+	gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
+	// if (user_edited_a_new_document) gtk_file_chooser_set_current_name (chooser,"Untitled document");
+	// else gtk_file_chooser_set_filename (chooser,existing_filename);
+	gint res = gtk_dialog_run (GTK_DIALOG (dialog));
+	if (res == GTK_RESPONSE_ACCEPT){
+		char *filename = gtk_file_chooser_get_filename (chooser);
+		g_print ("filename: %s\n", filename);
+		g_free (filename);
+	  }
+	gtk_widget_destroy (dialog);
+}
+
+// Choose font module
+
+void user_function (GtkFontChooser *self, gchar *fontname, gpointer user_data){
+	GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object (builder, "msg_textview"));
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
+	gtk_text_buffer_create_tag (buffer, "msg_font", "font", fontname, NULL);
+	g_print ("font %s\n", fontname);
+}
+
+void choose_font (GtkWidget *widget, gpointer data){
+	GtkWidget *dialog = gtk_font_chooser_dialog_new ("选择字体", (GtkWindow *)window);
+	gint res = gtk_dialog_run (GTK_DIALOG (dialog));
+
+	gtk_widget_destroy (dialog);
+}
+
 // Chat history module
 
 void load_chathistory_ui (GtkWidget *widget, gpointer data){
@@ -71,7 +103,7 @@ void load_chathistory_ui (GtkWidget *widget, gpointer data){
 	GtkWidget *chat_history_window = GTK_WIDGET (gtk_builder_get_object(builder, "chat_history_window"));
 
 	GtkWidget *history_close_button = GTK_WIDGET(gtk_builder_get_object(builder, "history_close_button"));
-	g_signal_connect (G_OBJECT(history_close_button), "clicked", G_CALLBACK(gtk_main_quit), NULL);
+	g_signal_connect_swapped (G_OBJECT(history_close_button), "clicked", G_CALLBACK(gtk_widget_destroy), (GtkWidget *)chat_history_window);
 
 	GtkWidget *chathistory_label = GTK_WIDGET(gtk_builder_get_object(builder, "chathistory_label"));
 	char text[20];
@@ -91,10 +123,13 @@ void load_chathistory_ui (GtkWidget *widget, gpointer data){
 		sprintf (msg, "\n%s:\n%s\n", namelist[i], msglist[i]);
 		gtk_text_buffer_insert (chat_history_textbuffer, &end, msg, -1);
 	}
-
+	chat_history_window = GTK_WIDGET (gtk_builder_get_object(builder, "chat_history_window"));
 	gtk_widget_show_all ((GtkWidget *)chat_history_window);
-	gtk_main ();
-	gtk_window_close ((GtkWindow *)chat_history_window);
+	chathistory_label = GTK_WIDGET(gtk_builder_get_object(builder, "chathistory_label"));
+	gtk_widget_show_all ((GtkWidget *)chathistory_label);
+	// gtk_main ();
+	// gtk_widget_destroy ((GtkWidget *)chat_history_window);
+	// gtk_window_close ((GtkWindow *)chat_history_window);
 }
 
 // Search and add friend module
@@ -189,14 +224,17 @@ void load_addfriend_ui (){
 void update_msg_textview (const gchar *name, const gchar *msg){
 	GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object (builder, "msg_textview"));
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
-	gtk_text_buffer_create_tag (buffer, NULL, "foreground", "blue", NULL);
 	GtkTextIter iter;
 	GtkTextIter end;
 	gtk_text_buffer_get_end_iter(buffer, &end);
-	gchar content[100];
-	sprintf (content, "\n%s:\n%s\n", name, msg);
-	gtk_text_buffer_insert (buffer, &end, content, -1);
 
+	const char *name_color;
+	if (strcmp (name, username) == 0) name_color = "blue_fg";
+	else name_color = "green_tag";
+	gtk_text_buffer_insert_with_tags_by_name (buffer, &end, name, -1, name_color, "name_l_margin", "name_t_margin", NULL);
+	gtk_text_buffer_insert (buffer, &end, "\n", -1);
+	gtk_text_buffer_insert_with_tags_by_name (buffer, &end, msg, -1, "bigger_font", "msg_l_margin", "msg_t_margin", NULL);
+	gtk_text_buffer_insert (buffer, &end, "\n", -1);
 }
 
 void friend_selected (GtkListBox *box, GtkListBoxRow *row, gpointer user_data){
@@ -348,6 +386,16 @@ void chat_init (){
 	gtk_widget_set_size_request (send_button, 90, 43);
 	gtk_overlay_add_overlay ((GtkOverlay *)type_overlay, send_button);
 
+	GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object (builder, "msg_textview"));
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
+	gtk_text_buffer_create_tag (buffer, "blue_fg", "foreground", "blue", NULL);	
+	gtk_text_buffer_create_tag (buffer, "green_fg", "foreground", "green", NULL);
+	gtk_text_buffer_create_tag (buffer, "bigger_font", "scale", 1.15, NULL);
+	gtk_text_buffer_create_tag (buffer, "name_l_margin", "left-margin", 35, NULL);
+	gtk_text_buffer_create_tag (buffer, "msg_l_margin", "left-margin", 50, NULL);
+	gtk_text_buffer_create_tag (buffer, "name_t_margin", "pixels-above-lines", 30, NULL);
+	gtk_text_buffer_create_tag (buffer, "msg_t_margin", "pixels-above-lines", 10, NULL);
+
 	// Search and add friend
 	GtkWidget *add_friend_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "add_friend_menuitem"));
 	g_signal_connect (G_OBJECT(add_friend_menuitem), "activate", G_CALLBACK(load_addfriend_ui), NULL);
@@ -355,6 +403,10 @@ void chat_init (){
 	// Choose file
 	GtkWidget *choose_file_button = GTK_WIDGET(gtk_builder_get_object(builder, "choose_file_button"));
 	g_signal_connect (G_OBJECT(choose_file_button), "clicked", G_CALLBACK(choose_file), NULL);
+
+	// Choose font
+	GtkWidget *choose_font_button = GTK_WIDGET(gtk_builder_get_object(builder, "choose_font_button"));
+	g_signal_connect (G_OBJECT(choose_font_button), "clicked", G_CALLBACK(choose_font), NULL);
 
 	// Chat history
 	GtkWidget *chat_history_button = GTK_WIDGET(gtk_builder_get_object(builder, "chat_history_button"));

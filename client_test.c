@@ -41,3 +41,13 @@ int request_chathistory (const char *friendname, char namelist[][MAX_LENGTH], ch
     sprintf (namelist[2], "DaDa"); sprintf (msglist[2], "How are you");
     return 3;
 }
+
+int agree_add_friend(const char* friendname)
+{
+    return 1;
+}
+
+int refuse_add_friend(const char* friendname)
+{
+    return 1;
+}

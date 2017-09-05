@@ -3,7 +3,7 @@
 - get search text OK
 - history text view OK
 - search friend margin OK
-- text style
+- text style 
 - save file
 
 - group chat
