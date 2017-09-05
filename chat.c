@@ -63,6 +63,7 @@ void choose_file (GtkWidget *widget, gpointer data){
 // Chat history module
 
 void load_chathistory_ui (GtkWidget *widget, gpointer data){
+	
 	if (strcmp (cur_chat_friend_name, "") == 0) return;
 
 	gchar namelist[MAX_NUM][MAX_LENGTH], msglist[MAX_NUM][MAX_LENGTH];
@@ -70,7 +71,7 @@ void load_chathistory_ui (GtkWidget *widget, gpointer data){
 	GtkWidget *chat_history_window = GTK_WIDGET (gtk_builder_get_object(builder, "chat_history_window"));
 
 	GtkWidget *history_close_button = GTK_WIDGET(gtk_builder_get_object(builder, "history_close_button"));
-	g_signal_connect (G_OBJECT(history_close_button), "clicked", G_CALLBACK(gtk_window_close), NULL);
+	g_signal_connect (G_OBJECT(history_close_button), "clicked", G_CALLBACK(gtk_main_quit), NULL);
 
 	GtkWidget *chathistory_label = GTK_WIDGET(gtk_builder_get_object(builder, "chathistory_label"));
 	char text[20];
@@ -92,6 +93,8 @@ void load_chathistory_ui (GtkWidget *widget, gpointer data){
 	}
 
 	gtk_widget_show_all ((GtkWidget *)chat_history_window);
+	gtk_main ();
+	gtk_window_close ((GtkWindow *)chat_history_window);
 }
 
 // Search and add friend module
@@ -179,13 +182,15 @@ void load_addfriend_ui (){
 
 void update_msg_textview (const gchar *name, const gchar *msg){
 	GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object (builder, "msg_textview"));
-	GtkTextBuffer *msg_textbuffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
-
+	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
+	gtk_text_buffer_create_tag (buffer, NULL, "foreground", "blue", NULL);
+	GtkTextIter iter;
 	GtkTextIter end;
-	gtk_text_buffer_get_end_iter(msg_textbuffer, &end);
+	gtk_text_buffer_get_end_iter(buffer, &end);
 	gchar content[100];
 	sprintf (content, "\n%s:\n%s\n", name, msg);
-	gtk_text_buffer_insert (msg_textbuffer, &end, content, -1);
+	gtk_text_buffer_insert (buffer, &end, content, -1);
+
 }
 
 void friend_selected (GtkListBox *box, GtkListBoxRow *row, gpointer user_data){
