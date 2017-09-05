@@ -21,7 +21,7 @@ typedef struct Msg_queue{
 extern Message *Message_new (const char *name, const char *text);
 extern Msg_queue *Msg_queue_new ();
 extern void Msg_queue_push (Msg_queue *msg_queue, Message *msg);
-extern Message *Msg_queue_front (Msg_queue *msg_queue);
+extern Message Msg_queue_front (Msg_queue *msg_queue);
 extern void Msg_queue_pop (Msg_queue *msg_queue);
 extern int Msg_queue_get_num (Msg_queue *msg_queue);
 extern int Msg_queue_is_empty (Msg_queue *msg_queue);

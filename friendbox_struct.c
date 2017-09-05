@@ -1,6 +1,8 @@
 #include <gtk/gtk.h>
 #include "friendbox_struct.h"
 
+#define MAX_WIDTH 20
+
 /*******************************************************************************
  * utalk_friendbox struct
  * 
@@ -134,7 +136,18 @@ const gchar *utalk_friendbox_with_msg_get_msg (GtkWidget *friendbox){
 	return gtk_label_get_text ((GtkLabel *)name_label);
 }
 
-void utalk_friendbox_with_msg_set_msg (GtkWidget *friendbox, const gchar *name){
-	GtkWidget *name_label = utalk_friendbox_with_msg_get_msg_label (friendbox);
-	gtk_label_set_text ((GtkLabel *)name_label, name);
+void utalk_friendbox_with_msg_set_msg (GtkWidget *friendbox, const gchar *msg){
+	GtkWidget *msg_label = utalk_friendbox_with_msg_get_msg_label (friendbox);
+	gchar s[30];
+	if (strlen (msg) > MAX_WIDTH){
+		strncpy (s, msg, MAX_WIDTH - 3);
+		s[MAX_WIDTH - 3] = '.';
+		s[MAX_WIDTH - 2] = '.';
+		s[MAX_WIDTH - 1] = '.';
+		s[MAX_WIDTH] = '\0';
+	}
+	else{
+		strcpy (s, msg);
+	}
+	gtk_label_set_text ((GtkLabel *)msg_label, s);
 }

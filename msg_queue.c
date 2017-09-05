@@ -25,8 +25,8 @@ void Msg_queue_push (Msg_queue *msg_queue, Message *msg){
     msg_queue->num++;
 }
 
-Message *Msg_queue_front (Msg_queue *msg_queue){
-    return msg_queue->head->next;
+Message Msg_queue_front (Msg_queue *msg_queue){
+    return *(msg_queue->head->next);
 }
 
 void Msg_queue_pop (Msg_queue *msg_queue){
