@@ -93,7 +93,7 @@ void signin_button_on_click(GtkWidget *widget, struct LOGIN_MASSAGE* login_massa
     }
 
     gtk_widget_hide (signin_window);
-    // inform_net ();
+    
     GtkWidget *chat_window = load_chat_window (username);
     if (chat_window == NULL){
         printf ("Load chat window failed!\n");

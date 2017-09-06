@@ -1,8 +1,23 @@
+/********************************************************************************
+ * Files         : client.h
+ * Description   : the client part of network.
+ * Author        : xinchengxin
+ * Last Modified : 2017.09.06, 09:28:47
+ ********************************************************************************/
+
 #ifndef __CLIENT_H
 #define __CLIENT_H
 
+
 #include "chat.h"
 
+
+ /********************************************************************************
+  * Description : Declaration of all needed functions from client.c. (add all needed function from client.c here)
+  * Author      : xinchengxin
+  * Date        : 2017.09.06
+  * Time        : 09:31:07
+  ********************************************************************************/
 extern int init_net (const char *);
 extern int signin (const char *, const char *);
 extern int signup (const char *, const char *);

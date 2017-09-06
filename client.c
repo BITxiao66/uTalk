@@ -1,3 +1,9 @@
+/********************************************************************************
+ * Files         : client.c
+ * Description   : the client part of network.
+ * Author        : xinchengxin
+ * Last Modified : 2017.09.06, 09:15:31
+ ********************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,18 +11,30 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
-
 #include "chat.h"
 
 
+#define SERVER_PORT 8000
 #define DEFAULT_PORT 8000
 #define MAXN 4000
 
+/********************************************************************************
+ * Description : Declaration of all global variables in client.c. (add all global variables appearing in client.c here)
+ * Author      : xinchengxin
+ * Date        : 2017.09.06
+ * Time        : 09:18:12
+ ********************************************************************************/
+char currect_name[21]; // username of currect login user
+int socket_fd, n; // socket id, n is used to transmit data between two threads
+char friend[1000][21];// array to transmit data between two thread
 
-char currect_name[21];
-int socket_fd, n;
-char friend[1000][21];
 
+ /********************************************************************************
+  * Description : Declaration of all functions in client.c. (add all function appearing in client.c here)
+  * Author      : xinchengxin
+  * Date        : 2017.09.06
+  * Time        : 09:15:45
+  ********************************************************************************/
 int init_net(const char *server_ip);
 int signin(const char* username, const char* password);
 int signup(const char* username, const char* password);
@@ -28,13 +46,21 @@ int inform_net();
 int agree_add_friend(const char* friendname);
 int refuse_add_friend(const char* friendname);
 void *recving (void *p_null);
-int request_chathistory (const char *friendname, char namelist[][MAX_LENGTH], char msglist[][MAX_LENGTH]);
+int request_chathistory (const char *friendname, char namelist[][21], char msglist[][21]);
+int agree_recv_file ();
+int refuse_recv_file ();
 
 
-#define SERVER_PORT 8000 // 客户机连接远程主机的端口
-
-
-int request_chathistory (const char *friendname, char namelist[][MAX_LENGTH], char msglist[][MAX_LENGTH]){
+/********************************************************************************
+ * Description : request chat history to server
+ * Prameter    : friend name, namelist[][21], msglist[][21]
+ * Return      : int : 1 success, 0 failed 
+ * Side effect : not finashed
+ * Author      : xinchengxin
+ * Date        : 2017.09.05
+ ********************************************************************************/
+int request_chathistory (const char *friendname, char namelist[][21], char msglist[][21])
+{
     sprintf (namelist[0], "DaDa"); sprintf (msglist[0], "Hello");
     sprintf (namelist[1], "xuda"); sprintf (msglist[1], "Hi");
     sprintf (namelist[2], "DaDa"); sprintf (msglist[2], "How are you");
@@ -42,11 +68,37 @@ int request_chathistory (const char *friendname, char namelist[][MAX_LENGTH], ch
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : not finashed
+ * Prameter    : not finashed
+ * Return      : not finashed
+ * Side effect : not finashed
+ * Author      : xinchengxin
+ * Date        : 2017.09.05
+ ********************************************************************************/
+int agree_recv_file ()
+{
+    return 1;
+}
+
+/********************************************************************************
+ * Description : not finashed
+ * Prameter    : not finashed
+ * Return      : not finashed
+ * Side effect : not finashed
+ * Author      : xinchengxin
+ * Date        : 2017.09.05
+ ********************************************************************************/
+int refuse_recv_file ()
+{
+    return 1;
+}
+
+/********************************************************************************
+ * Description : init network
+ * Prameter    : server ip
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send connect massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int init_net(const char *server_ip)
@@ -118,11 +170,11 @@ int init_net(const char *server_ip)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : sign in to server
+ * Prameter    : username and password
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send sign in massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int signin(const char* username, const char* password)
@@ -153,11 +205,11 @@ int signin(const char* username, const char* password)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : sign up to server
+ * Prameter    : username and password
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send sign up massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int signup(const char* username, const char* password)
@@ -187,11 +239,11 @@ int signup(const char* username, const char* password)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : request friendlist to server
+ * Prameter    : friendname[][21] to store friendnames
+ * Return      : friendname[][21] storing friendnames
+ * Side effect : change the values of friendname[][21]
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int load_friends_list(char friendname[][21])
@@ -206,16 +258,19 @@ int load_friends_list(char friendname[][21])
     for(int i = 0; i < n; i++)
     {
         strcpy(friendname[i], friend[i]);
+        puts("debug");
+        puts(friendname[i]);
+        printf ("in chat: addr: %d\n", friendname);
     }
     return n;
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : dispart the socket to two threads, sending and recieving
+ * Prameter    : none
+ * Return      : int : 1 success, 0 failed
+ * Side effect : create a new thread
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int inform_net()
@@ -226,11 +281,11 @@ int inform_net()
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : send a massage to a friend
+ * Prameter    : friendname, massage
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send a massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int send_msg(const char* friendname, const char* massage)
@@ -242,11 +297,11 @@ int send_msg(const char* friendname, const char* massage)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : send a friend request to a friend
+ * Prameter    : name of friend you want to add 
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send a friend request massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int add_friend_request(const char* friendname)
@@ -258,11 +313,11 @@ int add_friend_request(const char* friendname)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : send a agree response to a friend request from friend
+ * Prameter    : name of friend who want to add you
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send a massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int agree_add_friend(const char* friendname)
@@ -274,11 +329,11 @@ int agree_add_friend(const char* friendname)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : send a refuse response to a friend request from friend
+ * Prameter    : name of friend who want to add you
+ * Return      : int : 1 success, 0 failed
+ * Side effect : send a massage to server
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int refuse_add_friend(const char* friendname)
@@ -314,11 +369,11 @@ int search_friends(const char* text, char friendname[][21])
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : a thread function of recieving thread
+ * Prameter    : void *p_pull (no use)
+ * Return      : void *
+ * Side effect : a thread function
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 void *recving (void *p_null)
@@ -331,8 +386,11 @@ void *recving (void *p_null)
     {
         rlen = recv(socket_fd, recv_massage, MAXN, 0);
         puts(recv_massage);
+
+        //part 1, not massage
         if(recv_massage[0] == '/')
         {
+            //friend list or searchname list
             if(recv_massage[1] == '2' || recv_massage[1] == '5')
             {
                 FILE *fp = fopen("temp", "w");
@@ -346,39 +404,60 @@ void *recving (void *p_null)
                 }
                 fclose(rp);
             }
+            //abort add friend request
             else if(recv_massage[1] == '3')
             {
+                for(i = 0; i >= 0; i++)
+                {
+                    if(recv_massage[i] == '*')
+                    {
+                        recv_massage[i] = 0;
+                        break;
+                    }
+                }
+                //agree
                 if(recv_massage[3] == '3')
                 {
-                    sscanf(recv_massage, "/3:3%s*", friendname);
+                    sscanf(recv_massage, "/3:3%s", friendname);
                     friend_request_response(friendname, 1);
                 }
+                //refuse
                 else if(recv_massage[3] == '2')
                 {
-                    sscanf(recv_massage, "/3:2%s*", friendname);
+                    sscanf(recv_massage, "/3:2%s", friendname);
                     friend_request_response(friendname, 0);
                 }
+                //request
                 else 
                 {
-                    sscanf(recv_massage, "/3:%s*", friendname);
+                    sscanf(recv_massage, "/3:%s", friendname);
                     recv_friend_request(friendname);
                 }
             }
         }
+        //part 2 it is massage
         else
         {
-            sscanf(recv_massage, "%s:%s", friendname, massage);
+            for(i = 0; i >= 0; i++)
+            {
+                if(recv_massage[i] == ':')
+                {
+                    recv_massage[i] = ' ';
+                    break;
+                }
+            }
+            sscanf(recv_massage, "%s %s", friendname, massage);
             recv_msg(friendname, massage);
         }
     }
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : main function to test this mudular
+ * Prameter    : prameter of main function
+ * Return      : return value of main function
+ * Side effect : main function
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 // int main()

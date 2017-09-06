@@ -15,6 +15,10 @@ int signup (const char *username, const char *password){
     return 1;
 }
 
+int inform_net (){
+    return 1;
+}
+
 int load_friends_list (const char *username, char friendlist[][MAX_LENGTH]){
     strcpy (friendlist[0], "xuda");
     strcpy (friendlist[1], "shaw");

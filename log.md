@@ -6,7 +6,7 @@
 - text style OK
 - save file OK
 
-- trans avator
+- trans avator OK
 - name margin
 - signin
 - Second open

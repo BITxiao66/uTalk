@@ -11,7 +11,10 @@ GtkWidget *addfriend_window;
 GtkWidget *friends_listbox;
 
 gchar username[20];
+gint useravator;
 gchar cur_chat_friend_name[20];
+
+gint avator_selected;
 
 GList *friends_list;
 typedef struct FriendItem{
@@ -37,7 +40,7 @@ void server_error_dialog (GtkWidget *window){
 }
 
 void add_friend (const char *friend_name, const char *msg, int position){
-	GtkWidget *friendbox_with_msg = utalk_friendbox_with_msg_new ("dada.jpg", friend_name, msg);
+	GtkWidget *friendbox_with_msg = utalk_friendbox_with_msg_new ("0.jpg", friend_name, msg);
 	gtk_list_box_insert ((GtkListBox *)friends_listbox, friendbox_with_msg, position);
 
 	Msg_queue *msg_queue = Msg_queue_new ();
@@ -220,7 +223,7 @@ void search_button_clicked (GtkWidget *widget, gpointer data){
 		gtk_container_remove ((GtkContainer *)found_friends_listbox, (GtkWidget *)(l->data));
 	}
 	for (int i = 0; i < friends_num; i++){
-		GtkWidget *friendbox = utalk_friendbox_new ("dada.jpg", friendlist[i]);
+		GtkWidget *friendbox = utalk_friendbox_new ("0.jpg", friendlist[i]);
 		gtk_list_box_insert ((GtkListBox *)found_friends_listbox, friendbox, -1);
 	}
 	gtk_widget_show_all (found_friends_listbox);
@@ -353,6 +356,7 @@ void load_friends_list_from_server (){
 	char friends_name_list[MAX_NUM][MAX_LENGTH];
 	int friends_num = load_friends_list (username, friends_name_list);
 	g_print ("Load friends list done. friends counting %d.\n", friends_num);
+	g_print ("in chat: %s\n", friends_name_list[0]);
 
 	for (int i = 0; i < friends_num; i++){
 		add_friend (friends_name_list[i], "", -1);
@@ -382,6 +386,47 @@ void set_test_menu (){
 
 	GtkWidget *test_button = GTK_WIDGET (gtk_builder_get_object(builder, "test_button"));
 	g_signal_connect (G_OBJECT(test_button), "activate", G_CALLBACK(test), NULL);
+}
+
+void ok_button_clicked (GtkWidget *widget, gpointer data){
+	useravator = avator_selected;
+
+	GtkWidget *useravator_image = GTK_WIDGET (gtk_builder_get_object(builder, "useravator_image"));
+	gchar *path;
+	sprintf (path, "%d.jpg", avator_selected);
+	gtk_image_set_from_file ((GtkImage *)useravator_image, path);
+
+	GtkWidget *avator_dialog = GTK_WIDGET (gtk_builder_get_object(builder, "avator_dialog"));
+	gtk_dialog_response ((GtkDialog *)avator_dialog, GTK_RESPONSE_OK);
+}
+
+void select_avator (GtkWidget *widget, gpointer data){
+	avator_selected = (int)widget;
+	g_print ("avator id = %d\n", avator_selected);
+}
+
+void set_avator_eventbox (){
+	for (int i = 1; i <= 9; i++){
+		char eventbox_name[10];
+		sprintf (eventbox_name, "eventbox%d", i);
+		g_print ("box name %s", eventbox_name);
+		GtkWidget *eventbox = GTK_WIDGET(gtk_builder_get_object(builder, eventbox_name));
+		gint id = i;
+		g_signal_connect_swapped (G_OBJECT(eventbox), "button_press_event", G_CALLBACK(select_avator), id);		
+	}
+}
+
+void change_avator (GtkWidget *widget, gpointer data){
+	GtkWidget *avator_dialog = GTK_WIDGET (gtk_builder_get_object(builder, "avator_dialog"));
+	
+	set_avator_eventbox ();
+
+	GtkWidget *ok_button = GTK_WIDGET(gtk_builder_get_object(builder, "ok_button"));
+	g_signal_connect (G_OBJECT(ok_button), "clicked", G_CALLBACK(ok_button_clicked), NULL);
+
+	gtk_dialog_run ((GtkDialog *)avator_dialog);
+	gtk_widget_destroy (avator_dialog);
+	g_print ("avator id = %d\n", useravator);
 }
 
 void chat_init (){
@@ -429,6 +474,10 @@ void chat_init (){
 	GtkWidget *chat_history_button = GTK_WIDGET(gtk_builder_get_object(builder, "chat_history_button"));
 	g_signal_connect (G_OBJECT(chat_history_button), "clicked", G_CALLBACK(load_chathistory_ui), NULL);
 
+	// Change avator
+	GtkWidget *change_avator_menuitem = GTK_WIDGET(gtk_builder_get_object(builder, "change_avator_menuitem"));
+	g_signal_connect (G_OBJECT(change_avator_menuitem), "activate", G_CALLBACK(change_avator), NULL);
+
 	set_test_menu ();
 }
 
@@ -442,8 +491,10 @@ GtkWidget *load_chat_window (const char *recv_username){
 	strcpy (username, recv_username);
 	memset (cur_chat_friend_name, 0, sizeof(cur_chat_friend_name));
 
+	inform_net ();
 	chat_init ();
 	load_friends_list_from_server ();
+	useravator = 0;
 
 	window = GTK_WIDGET (gtk_builder_get_object(builder, "window"));
 	gtk_widget_show_all (window);
