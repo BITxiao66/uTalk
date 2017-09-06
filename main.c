@@ -5,7 +5,7 @@
 #include "chat.h"
 #include "client.h"
 
-char server_ip[20] = "127.0.0.1";
+char server_ip[20] = "192.168.43.235";
 GtkWidget *signin_window;
 GtkWidget *signup_window;
 
@@ -93,6 +93,7 @@ void signin_button_on_click(GtkWidget *widget, struct LOGIN_MASSAGE* login_massa
     }
 
     gtk_widget_hide (signin_window);
+    
     GtkWidget *chat_window = load_chat_window (username);
     if (chat_window == NULL){
         printf ("Load chat window failed!\n");
@@ -101,8 +102,6 @@ void signin_button_on_click(GtkWidget *widget, struct LOGIN_MASSAGE* login_massa
     else{
         printf ("Load chat window successfully!\n");
     }
-
-    gtk_widget_show_all (chat_window);
 }
 
 void signin_to_signup(GtkWidget *widget, gpointer data){

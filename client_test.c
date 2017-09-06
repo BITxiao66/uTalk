@@ -15,7 +15,11 @@ int signup (const char *username, const char *password){
     return 1;
 }
 
-int load_friends_list (const char *username, char friendlist[][MAX_LENGTH]){
+int inform_net (){
+    return 1;
+}
+
+int load_friends_list (char friendlist[][MAX_LENGTH]){
     strcpy (friendlist[0], "xuda");
     strcpy (friendlist[1], "shaw");
     return 2;
@@ -40,4 +44,26 @@ int request_chathistory (const char *friendname, char namelist[][MAX_LENGTH], ch
     sprintf (namelist[1], "xuda"); sprintf (msglist[1], "Hi");
     sprintf (namelist[2], "DaDa"); sprintf (msglist[2], "How are you");
     return 3;
+}
+
+int agree_add_friend(const char* friendname)
+{
+    return 1;
+}
+
+int refuse_add_friend(const char* friendname)
+{
+    return 1;
+}
+
+int agree_recv_file (){
+    return 1;
+}
+
+int refuse_recv_file (){
+    return 1;
+}
+
+int send_useravator (int avator_id){
+    return 1;
 }
