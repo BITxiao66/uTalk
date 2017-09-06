@@ -406,9 +406,9 @@ void *recving (void *p_null)
             {
                 for(i = 0; i >= 0; i++)
                 {
-                    if(receive_message[i] == '*')
+                    if(recv_massage[i] == '*')
                     {
-                        receive_message[i] = 0;
+                        recv_massage[i] = 0;
                         break;
                     }
                 }
@@ -437,9 +437,9 @@ void *recving (void *p_null)
         {
             for(i = 0; i >= 0; i++)
             {
-                if(receive_message[i] == ':')
+                if(recv_massage[i] == ':')
                 {
-                    receive_message[i] = ' ';
+                    recv_massage[i] = ' ';
                     break;
                 }
             }
