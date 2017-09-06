@@ -51,3 +51,11 @@ int refuse_add_friend(const char* friendname)
 {
     return 1;
 }
+
+int agree_recv_file (){
+    return 1;
+}
+
+int refuse_recv_file (){
+    return 1;
+}

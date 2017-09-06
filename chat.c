@@ -60,13 +60,17 @@ void choose_file (GtkWidget *widget, gpointer data){
 	gtk_widget_destroy (dialog);
 }
 
-void recv_file (){
-	GtkWidget *dialog = gtk_file_chooser_dialog_new ("Save File", (GtkWindow *)window ,GTK_FILE_CHOOSER_ACTION_SAVE,
-										  "Cancel", GTK_RESPONSE_CANCEL, "Save", GTK_RESPONSE_ACCEPT, NULL);
+static GtkFileChooserConfirmation confirm_overwrite (GtkFileChooser *chooser, gpointer data){
+	return GTK_FILE_CHOOSER_CONFIRMATION_CONFIRM;
+}
+
+void save_file (){
+	GtkWidget *dialog = gtk_file_chooser_dialog_new ("保存文件", (GtkWindow *)window ,GTK_FILE_CHOOSER_ACTION_SAVE,
+										  "取消", GTK_RESPONSE_CANCEL, "保存", GTK_RESPONSE_ACCEPT, NULL);
 	GtkFileChooser *chooser = GTK_FILE_CHOOSER (dialog);
 	gtk_file_chooser_set_do_overwrite_confirmation (chooser, TRUE);
-	// if (user_edited_a_new_document) gtk_file_chooser_set_current_name (chooser,"Untitled document");
-	// else gtk_file_chooser_set_filename (chooser,existing_filename);
+	gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+	g_signal_connect (chooser, "confirm-overwrite", G_CALLBACK (confirm_overwrite), NULL);
 	gint res = gtk_dialog_run (GTK_DIALOG (dialog));
 	if (res == GTK_RESPONSE_ACCEPT){
 		char *filename = gtk_file_chooser_get_filename (chooser);
@@ -76,9 +80,27 @@ void recv_file (){
 	gtk_widget_destroy (dialog);
 }
 
+int recv_file (){
+	gchar *msg = "您收到了文件";
+	GtkWidget *dialog = gtk_message_dialog_new (GTK_WINDOW(window), GTK_DIALOG_MODAL, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", msg);
+	gtk_window_set_title (GTK_WINDOW(dialog), "文件");
+	gint result = gtk_dialog_run (GTK_DIALOG(dialog));
+	gtk_widget_destroy (dialog);
+
+	if (result == GTK_RESPONSE_YES){
+		agree_recv_file ();
+		save_file ();
+		return 1;
+	}
+	else{
+		refuse_recv_file ();
+		return 0;
+	}
+}
+
 // Choose font module
 
-void user_function (GtkFontChooser *self, gchar *fontname, gpointer user_data){
+void select_font (GtkFontChooser *self, gchar *fontname, gpointer user_data){
 	GtkWidget *msg_textview = GTK_WIDGET(gtk_builder_get_object (builder, "msg_textview"));
 	GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (msg_textview));
 	gtk_text_buffer_create_tag (buffer, "msg_font", "font", fontname, NULL);
@@ -339,12 +361,7 @@ void load_friends_list_from_server (){
 }
 
 void test (GtkWidget *widget, gpointer data){
-	int num = 2;
-	const char *name[3], *msg[3];
-	name[0] = "shaw";
-	msg[0] = "hello";
-	name[1] = "xuda";
-	msg[1] = "hehe";
+	recv_file ();
 }
 
 void set_test_menu (){
@@ -363,8 +380,8 @@ void set_test_menu (){
 	// GtkWidget *v_friend_request_ref_menuitem = GTK_WIDGET (gtk_builder_get_object(builder, "v_friend_request_ref_menuitem"));
 	// g_signal_connect (G_OBJECT(v_friend_request_ref_menuitem), "activate", G_CALLBACK(v_friend_request_ref), NULL);
 
-	// GtkWidget *test_button = GTK_WIDGET (gtk_builder_get_object(builder, "test_button"));
-	// g_signal_connect (G_OBJECT(test_button), "activate", G_CALLBACK(test), NULL);
+	GtkWidget *test_button = GTK_WIDGET (gtk_builder_get_object(builder, "test_button"));
+	g_signal_connect (G_OBJECT(test_button), "activate", G_CALLBACK(test), NULL);
 }
 
 void chat_init (){

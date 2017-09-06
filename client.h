@@ -19,4 +19,7 @@ extern int refuse_add_friend(const char* friendname);
 
 extern int request_chathistory (const char *, char namelist[][MAX_LENGTH], char msglist[][MAX_LENGTH]);
 
+extern int agree_recv_file ();
+extern int refuse_recv_file ();
+
 #endif

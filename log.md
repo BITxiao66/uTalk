@@ -3,19 +3,19 @@
 - get search text OK
 - history text view OK
 - search friend margin OK
-- text style 
-- save file
+- text style OK
+- save file OK
 
-- group chat
 - trans avator
-- stiker
 - name margin
-
 - signin
-- test module
-
 - Second open
 
+
+- group chat
+- stiker
+
+- test module
 
 ## 功能
 
