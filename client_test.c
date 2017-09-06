@@ -19,7 +19,7 @@ int inform_net (){
     return 1;
 }
 
-int load_friends_list (const char *username, char friendlist[][MAX_LENGTH]){
+int load_friends_list (char friendlist[][MAX_LENGTH]){
     strcpy (friendlist[0], "xuda");
     strcpy (friendlist[1], "shaw");
     return 2;
@@ -61,5 +61,9 @@ int agree_recv_file (){
 }
 
 int refuse_recv_file (){
+    return 1;
+}
+
+int send_useravator (int avator_id){
     return 1;
 }

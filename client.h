@@ -23,7 +23,7 @@ extern int signin (const char *, const char *);
 extern int signup (const char *, const char *);
 extern int inform_net ();
 
-extern int load_friends_list (const char *, char friendlist[][MAX_LENGTH]);
+extern int load_friends_list (char friendlist[][MAX_LENGTH]);
 extern int send_msg (const char *, const char *);
 
 extern int search_friends (const char *, char friendname[][MAX_LENGTH]);
@@ -36,5 +36,7 @@ extern int request_chathistory (const char *, char namelist[][MAX_LENGTH], char 
 
 extern int agree_recv_file ();
 extern int refuse_recv_file ();
+
+extern int send_useravator (int);
 
 #endif

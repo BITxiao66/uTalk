@@ -49,6 +49,21 @@ void *recving (void *p_null);
 int request_chathistory (const char *friendname, char namelist[][21], char msglist[][21]);
 int agree_recv_file ();
 int refuse_recv_file ();
+int send_useravator (int avator_id);
+
+
+/********************************************************************************
+ * Description : request chat history to server
+ * Prameter    : friend name, namelist[][21], msglist[][21]
+ * Return      : int : 1 success, 0 failed 
+ * Side effect : not finashed
+ * Author      : xinchengxin
+ * Date        : 2017.09.05
+ ********************************************************************************/
+int send_useravator (int avator_id)
+{
+    return 1;
+}
 
 
 /********************************************************************************
@@ -134,12 +149,12 @@ int init_net(const char *server_ip)
     else if (recvbytes > 0)
     {
         buf[recvbytes] = '\0';
-        got_port = atoi(buf);//端口号
+        got_port = atoi(buf);//port
         printf("%d\n",got_port);
     }
 
     _2_server_sockaddr.sin_family = AF_INET;
-    _2_server_sockaddr.sin_port = htons(got_port);//改成传输来的端口号
+    _2_server_sockaddr.sin_port = htons(got_port);//change to port recieved
     _2_server_sockaddr.sin_addr.s_addr = htonl(INADDR_ANY); 
     int server_len = sizeof(_2_server_sockaddr);
 
@@ -258,9 +273,7 @@ int load_friends_list(char friendname[][21])
     for(int i = 0; i < n; i++)
     {
         strcpy(friendname[i], friend[i]);
-        puts("debug");
         puts(friendname[i]);
-        printf ("in chat: addr: %d\n", friendname);
     }
     return n;
 }
@@ -345,11 +358,11 @@ int refuse_add_friend(const char* friendname)
 }
 
 /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return      : 
- * Side effect : 
- * Author      : 
+ * Description : request friendlist to server
+ * Prameter    : friendname[][21] to store friendnames
+ * Return      : friendname[][21] storing friendnames
+ * Side effect : change the values of friendname[][21]
+ * Author      : xinchengxin
  * Date        : 2017.09.05
  ********************************************************************************/
 int search_friends(const char* text, char friendname[][21])
@@ -431,7 +444,10 @@ void *recving (void *p_null)
                 else 
                 {
                     sscanf(recv_massage, "/3:%s", friendname);
-                    recv_friend_request(friendname);
+
+                    char *name = (char *)malloc (20);
+                    sprintf (name, "%s", friendname);
+                    recv_friend_request(name);
                 }
             }
         }
