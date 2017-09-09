@@ -1,8 +1,18 @@
 /********************************************************************************
  * Files         : server.c
  * Description   : the server mode of the uTalk.
- * Author        : xiaoziyuan,sunjinda
- * Last Modified : 2017.09.02
+                 : 北京理工大学 计算机学院 2015级大三小学期
+                 : uTalk开发人员列表
+                 : UI 徐恒达
+                 : comunication mode in client 辛成鑫 许达
+                 : server 肖子原
+                 : database 孙今达 
+ * Author        : 肖子原 孙今达
+                 : 数据库部分由孙今达提供技术支持，已经融入server模块
+ * For developer : 详细信息参考 note.txt
+                 : 获取更多信息，欢迎联系 计算机学院15级 肖子原 xiaoziyuan@bit.edu.cn
+ * Last Modified : 2017.09.07 于中关村 北京理工大学
+ * Copyrights (c) xiaoziyuan  & sunjinda all rights reserved
  ********************************************************************************/
  #include <sys/types.h>
  #include <mysql/mysql.h>
@@ -231,6 +241,7 @@ int if_user_exist(const char* line)
     mysql_close(conn);
     return 1;
 }
+
 int search_avator_from_db(const char* username)
 {
     //making connection 
@@ -500,7 +511,7 @@ void itoa(int n,char*str)
 	str[4]=0;
 }
  /********************************************************************************
- * Description : 
+ * Description : ；判断用户是否在线
  * Prameter    : char*,the name which you want to check
  * Return      : -1               :not online 
                 non-negative int  :the position in the array online_user
@@ -521,14 +532,19 @@ int if_user_online(const char *name)
 }
 
  /********************************************************************************
- * Description : 
- * Prameter    : 
- * Return         : 
+ * Description : 用于处理收到的命令，只处理，不发送 
+ *             : 还留有命令端口给学弟学妹，可以添加自己的功能
+ * Prameter    : (1)指向对面用户 sockfd 的指针，不向对面发送消息的时候赋值为0
+ *             : (2)当前用户在 online_user 数组中的下标，用来知道是谁发的命令
+ *             : (3)指向发给自己的消息的指针
+ *             : (4)指向发给对面用户消息的指针
+ *             : (5)原始消息
+ * Return      :无意义 
   
- * Side effect : Function is not completed.
- * Author      : xiaoziyuan
- * Date        : 
- * Time        : 
+ * Side effect : 可能会修改opp_sockfd
+ * Author      : 肖子原
+ * Date        : 2017.09.07 于中关村 北京理工大学
+ * Time        : 14:03
  ********************************************************************************/
  int process_command(int* p_to_sockfd,int current_userID,char* p_msg_to_slef,char*p_msg_to_opp,const char*original_msg)
  {
@@ -771,15 +787,13 @@ int if_user_online(const char *name)
  }
 
   /********************************************************************************
- * Description : 
- * Prameter    :         strcpy(temp,"offline_msg/");
-            strcat(temp,self_name);
- * Return      : 
-  
+ * Description : 用于处理收到的消息，只处理，不发送 
+ * Prameter    : 参考 process_command
+ * Return      : 无意义
  * Side effect : Function is not completed.
  * Author      : xiaoziyuan
- * Date        : 
- * Time        : 
+ * Date        : 2017.09.07
+ * Time        : 14:39
  ********************************************************************************/
  int process_msg(int* p_to_sockfd,int current_userID,char* p_msg_to_slef,char*p_msg_to_opp,const char*original_msg)
  {
@@ -839,16 +853,14 @@ int if_user_online(const char *name)
     return 1;
  }
 
-   /********************************************************************************
- * Description : 
- * Prameter    :         strcpy(temp,"offline_msg/");
-            strcat(temp,self_name);
- * Return      : 
-  
- * Side effect : Function is not completed.
- * Author      : xiaoziyuan
- * Date        : 
- * Time        : 
+/********************************************************************************
+ * Description : 处理文件消息，发布版本已改为 P2P 
+ * Prameter    : 参考 process_command
+ * Return      : 无意义
+ * Side effect : 参考 process_command
+ * Author      : 肖子原
+ * Date        : 2017.09.07 于中关村 北京理工大学
+ * Time        : 14:26
  ********************************************************************************/
 int process_file(int* p_to_sockfd,int current_userID,char *p_msg_to_opp,const char*original_msg,int len)
 {
@@ -894,13 +906,13 @@ int process_file(int* p_to_sockfd,int current_userID,char *p_msg_to_opp,const ch
 }
 
  /********************************************************************************
- * Description : int to string
- * Prameter    : int n:a in number   const char* str:destination
- * Return      : void
- * Side effect : Function is not completed.
- * Author      : xiaoziyuan
- * Date        : 2017.09.02
- * Time        : 11:03:00
+ * Description : 用于开启子线程 只收发 处理在子函数中进行
+ * Prameter    : void* 赋值 NULL 即可
+ * Return      : void* 当用户登出或掉线时函数返回，结束线程，返还资源
+ * Side effect : 子线程在登出时必须关闭子线程
+ * Author      : 肖子原
+ * Date        : 2017.09.07 于中关村 北京理工大学 
+ * Time        : 14:19
  ********************************************************************************/
  void* _pthread_entrance(void* p)
  {
@@ -968,13 +980,13 @@ int process_file(int* p_to_sockfd,int current_userID,char *p_msg_to_opp,const ch
     }
  }
  /********************************************************************************
- * Description : After user clicked the signin button in signin window, signin.
- * Prameter    : Function is not completed.
- * Return      : void
- * Side effect : Function is not completed.
- * Author      : xiaoziyuan
- * Date        : 2017.09.02
- * Time        : 23:43
+ * Description : The entrance of whole soft
+ * Prameter    : boid
+ * Return      : 0
+ * Side effect : 
+ * Author      : 肖子原
+ * Date        : 2017.09.07 于中关村 北京理工大学
+ * Time        : 14:19
  ********************************************************************************/
 int main()
 {
