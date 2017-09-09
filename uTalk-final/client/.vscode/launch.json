@@ -1,0 +1,31 @@
+/*******************************************************************************
+ * Debug Launch File in VS Code
+ * File         : launch.json
+ * Location     : ${workspaceRoot}/.vscode/
+ * Last Modified: Sep 7, 2017
+ * Author       : DaDaMr_X <dadamrxx@gmail.com>
+ * Licence      : Copyright (c) 2017 DaDaMr_X
+ ******************************************************************************/
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "C Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "stopAtEntry": false,
+            "cwd": "${workspaceRoot}",
+            "externalConsole": true,
+            "preLaunchTask": "compile",
+            "MIMode": "gdb",
+            "program": "${workspaceRoot}/uTalk", 
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}
